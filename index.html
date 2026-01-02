@@ -3,64 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flashcards Inglés</title>
+    <title>Refold Smart Flashcards</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; background-color: #f0f2f5; }
-        .card-container { perspective: 1000px; width: 300px; height: 400px; cursor: pointer; margin-top: 50px; }
-        .card { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        :root { --primary: #6366f1; --success: #22c55e; --error: #ef4444; --bg: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 20px; min-height: 100vh; }
+        
+        #progress-container { width: 350px; background: #e2e8f0; height: 8px; border-radius: 4px; margin-bottom: 20px; }
+        #progress-bar { width: 0%; background: var(--primary); height: 100%; border-radius: 4px; transition: 0.3s; }
+
+        .card-container { perspective: 1000px; width: 350px; height: 450px; cursor: pointer; }
+        .card { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.5s; transform-style: preserve-3d; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .card.is-flipped { transform: rotateY(180deg); }
-        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; border-radius: 15px; background: white; box-sizing: border-box; }
-        .card-back { transform: rotateY(180deg); background-color: #e3f2fd; }
-        img { width: 100%; height: 150px; object-fit: cover; border-radius: 10px; margin-bottom: 15px; }
-        .word { font-size: 24px; font-weight: bold; color: #1a73e8; }
-        .sentence { font-style: italic; margin-top: 10px; color: #555; }
-        .translation { margin-top: 15px; color: #2e7d32; font-weight: 500; }
-        button { margin-top: 20px; padding: 10px 20px; border: none; background: #1a73e8; color: white; border-radius: 5px; cursor: pointer; }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; padding: 25px; border-radius: 20px; background: white; box-sizing: border-box; justify-content: space-between; border: 1px solid #e2e8f0; }
+        .card-back { transform: rotateY(180deg); background-color: #f1f5f9; }
+        
+        img { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; }
+        .word { font-size: 28px; font-weight: 800; color: var(--primary); margin: 10px 0; }
+        .sentence { font-size: 18px; color: #475569; line-height: 1.4; font-style: italic; }
+        .translation { font-size: 18px; color: #059669; font-weight: 600; margin-top: 10px; }
+
+        .controls { margin-top: 25px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 350px; }
+        button { padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; transition: 0.2s; color: white; }
+        .btn-easy { background: var(--success); }
+        .btn-hard { background: var(--error); }
+        .btn-speak { background: #64748b; grid-column: span 2; }
+        button:hover { opacity: 0.8; transform: scale(0.98); }
+        
+        .stats { margin-top: 20px; font-size: 0.9em; color: #64748b; }
     </style>
 </head>
 <body>
 
-    <h2>Aprende Inglés</h2>
-    
-    <div class="card-container" onclick="this.querySelector('.card').classList.toggle('is-flipped')">
+    <div id="stats" class="stats">Dominadas: 0 / 100</div>
+    <div id="progress-container"><div id="progress-bar"></div></div>
+
+    <div class="card-container" onclick="flipCard()">
         <div class="card" id="flashcard">
-            <div class="card-face card-front">
-                <img id="card-img" src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c" alt="Imagen">
-                <div class="word" id="card-word">Apple</div>
-                <div class="sentence" id="card-sentence">"I eat an apple every morning."</div>
+            <div class="card-face">
+                <img id="card-img" src="" alt="Cargando...">
+                <div class="word" id="card-word">...</div>
+                <div class="sentence" id="card-sentence">...</div>
+                <p style="color: #94a3b8; font-size: 0.8em;">Toca para ver traducción</p>
             </div>
-            <div class="card-face card-back">
+            <div class="card-back card-face">
                 <h3>Traducción</h3>
-                <div class="word">Manzana</div>
-                <div class="translation" id="card-translation">"Como una manzana cada mañana."</div>
+                <div class="word" id="card-trans-word">...</div>
+                <div class="translation" id="card-trans-sentence">...</div>
+                <p style="color: #94a3b8; font-size: 0.8em;">Toca para volver</p>
             </div>
         </div>
     </div>
 
-    <button onclick="nextCard()">Siguiente Tarjeta</button>
+    <div class="controls">
+        <button class="btn-speak" onclick="event.stopPropagation(); speak()">🔊 Escuchar de nuevo</button>
+        <button class="btn-hard" onclick="event.stopPropagation(); handleAnswer(false)">❌ Difícil (Repetir pronto)</button>
+        <button class="btn-easy" onclick="event.stopPropagation(); handleAnswer(true)">✅ Fácil (Dominada)</button>
+    </div>
 
     <script>
-        const deck = [
-            { word: "Apple", translation: "Manzana", sentence: "I eat an apple every morning.", sTranslation: "Como una manzana cada mañana.", img: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6" },
-            { word: "House", translation: "Casa", sentence: "My house is big and blue.", sTranslation: "Mi casa es grande y azul.", img: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914" }
+        // OPCIÓN B: Lista inicial de Refold (Simplificada a 5 ejemplos, pero estructurada para 100)
+        const initialDeck = [
+            { word: "Time", translation: "Tiempo", sentence: "I don't have enough time.", sTranslation: "No tengo suficiente tiempo.", img: "https://images.unsplash.com/photo-1508921334172-b68ed335b3dd", level: 0 },
+            { word: "Year", translation: "Año", sentence: "This was a great year.", sTranslation: "Este fue un gran año.", img: "https://images.unsplash.com/photo-1583339793403-3d9b001b6008", level: 0 },
+            { word: "People", translation: "Gente", sentence: "There are many people here.", sTranslation: "Hay mucha gente aquí.", img: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1", level: 0 },
+            { word: "Way", translation: "Camino / Manera", sentence: "This is the right way.", sTranslation: "Este es el camino correcto.", img: "https://images.unsplash.com/photo-1470770841072-f978cf4d019e", level: 0 },
+            { word: "Day", translation: "Día", sentence: "Have a nice day!", sTranslation: "¡Que tengas un buen día!", img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb", level: 0 }
+            // Aquí puedes seguir pegando hasta llegar a 1000
         ];
 
+        let deck = JSON.parse(localStorage.getItem('refold_deck')) || initialDeck;
         let currentIndex = 0;
 
-        function nextCard() {
-            currentIndex = (currentIndex + 1) % deck.length;
-            const card = document.getElementById('flashcard');
-            card.classList.remove('is-flipped'); // Voltear al frente antes de cambiar
+        function updateUI() {
+            const item = deck[currentIndex];
+            document.getElementById('card-word').innerText = item.word;
+            document.getElementById('card-sentence').innerText = item.sentence;
+            document.getElementById('card-img').src = item.img;
+            document.getElementById('card-trans-word').innerText = item.translation;
+            document.getElementById('card-trans-sentence').innerText = item.sTranslation;
             
-            setTimeout(() => {
-                document.getElementById('card-word').innerText = deck[currentIndex].word;
-                document.getElementById('card-sentence').innerText = `"${deck[currentIndex].sentence}"`;
-                document.getElementById('card-img').src = deck[currentIndex].img;
-                // Actualizar trasera
-                card.querySelector('.card-back .word').innerText = deck[currentIndex].translation;
-                document.getElementById('card-translation').innerText = `"${deck[currentIndex].sTranslation}"`;
-            }, 200);
+            // Actualizar Progreso
+            const mastered = deck.filter(c => c.level > 0).length;
+            document.getElementById('stats').innerText = `Dominadas: ${mastered} / ${deck.length}`;
+            document.getElementById('progress-bar').style.width = `${(mastered / deck.length) * 100}%`;
+            
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            
+            // Auto-reproducir voz al cambiar (opcional)
+            setTimeout(speak, 500);
         }
+
+        function flipCard() {
+            document.getElementById('flashcard').classList.toggle('is-flipped');
+        }
+
+        // OPCIÓN C: Lógica de Repetición Espaciada simple
+        function handleAnswer(isEasy) {
+            if (isEasy) {
+                deck[currentIndex].level += 1;
+                // Mover al final para que no aparezca pronto
+                const item = deck.splice(currentIndex, 1)[0];
+                deck.push(item);
+            } else {
+                deck[currentIndex].level = 0;
+                // Mover solo unos puestos adelante para verla pronto
+                const item = deck.splice(currentIndex, 1)[0];
+                deck.splice(5, 0, item); 
+            }
+            
+            localStorage.setItem('refold_deck', JSON.stringify(deck));
+            updateUI();
+        }
+
+        function speak() {
+            const item = deck[currentIndex];
+            window.speechSynthesis.cancel(); // Detener audios previos
+            const msgWord = new SpeechSynthesisUtterance(item.word);
+            const msgSentence = new SpeechSynthesisUtterance(item.sentence);
+            msgWord.lang = 'en-US';
+            msgSentence.lang = 'en-US';
+            msgWord.rate = 0.8;
+            msgSentence.rate = 0.8;
+
+            window.speechSynthesis.speak(msgWord);
+            msgWord.onend = () => {
+                setTimeout(() => window.speechSynthesis.speak(msgSentence), 400);
+            };
+        }
+
+        updateUI();
     </script>
 </body>
 </html>
