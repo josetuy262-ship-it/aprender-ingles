@@ -3,135 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Refold Smart Flashcards</title>
+    <title>English Flashcards Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #6366f1; --success: #22c55e; --error: #ef4444; --bg: #f8fafc; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 20px; min-height: 100vh; }
+        :root { --primary: #4f46e5; --success: #10b981; --error: #ef4444; --text: #1e293b; }
+        body { font-family: 'Inter', sans-serif; background: #f1f5f9; color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
         
-        #progress-container { width: 350px; background: #e2e8f0; height: 8px; border-radius: 4px; margin-bottom: 20px; }
-        #progress-bar { width: 0%; background: var(--primary); height: 100%; border-radius: 4px; transition: 0.3s; }
+        .header { position: fixed; top: 20px; text-align: center; }
+        .progress-text { font-size: 0.9rem; font-weight: 600; color: #64748b; margin-bottom: 8px; }
+        .bar-bg { width: 300px; height: 6px; background: #e2e8f0; border-radius: 10px; overflow: hidden; }
+        .bar-fill { width: 0%; height: 100%; background: var(--primary); transition: width 0.4s ease; }
 
-        .card-container { perspective: 1000px; width: 350px; height: 450px; cursor: pointer; }
-        .card { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.5s; transform-style: preserve-3d; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .card-container { perspective: 1000px; width: 340px; height: 480px; margin-top: 80px; }
+        .card { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
         .card.is-flipped { transform: rotateY(180deg); }
-        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; padding: 25px; border-radius: 20px; background: white; box-sizing: border-box; justify-content: space-between; border: 1px solid #e2e8f0; }
-        .card-back { transform: rotateY(180deg); background-color: #f1f5f9; }
         
-        img { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; }
-        .word { font-size: 28px; font-weight: 800; color: var(--primary); margin: 10px 0; }
-        .sentence { font-size: 18px; color: #475569; line-height: 1.4; font-style: italic; }
-        .translation { font-size: 18px; color: #059669; font-weight: 600; margin-top: 10px; }
+        .face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 24px; background: white; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); display: flex; flex-direction: column; padding: 24px; box-sizing: border-box; }
+        .face-back { transform: rotateY(180deg); background: #f8fafc; border: 2px solid var(--primary); }
 
-        .controls { margin-top: 25px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 350px; }
-        button { padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; transition: 0.2s; color: white; }
-        .btn-easy { background: var(--success); }
-        .btn-hard { background: var(--error); }
-        .btn-speak { background: #64748b; grid-column: span 2; }
-        button:hover { opacity: 0.8; transform: scale(0.98); }
+        .img-box { width: 100%; height: 200px; background: #f1f5f9; border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s; }
         
-        .stats { margin-top: 20px; font-size: 0.9em; color: #64748b; }
+        .word-en { font-size: 32px; font-weight: 800; color: var(--primary); margin: 0; }
+        .sentence-en { font-size: 18px; color: #475569; margin-top: 12px; line-height: 1.5; flex-grow: 1; }
+        
+        .word-es { font-size: 28px; font-weight: 700; color: var(--success); }
+        .sentence-es { font-size: 16px; color: #64748b; margin-top: 10px; font-style: italic; }
+
+        .controls { display: flex; gap: 12px; margin-top: 30px; width: 340px; }
+        button { flex: 1; padding: 16px; border: none; border-radius: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-size: 14px; }
+        .btn-hard { background: #fee2e2; color: var(--error); }
+        .btn-easy { background: #dcfce7; color: var(--success); }
+        button:active { transform: scale(0.95); }
+        
+        .btn-audio { background: white; color: var(--primary); border: 2px solid #e2e8f0; margin-top: 10px; width: 340px; }
     </style>
 </head>
 <body>
 
-    <div id="stats" class="stats">Dominadas: 0 / 100</div>
-    <div id="progress-container"><div id="progress-bar"></div></div>
+    <div class="header">
+        <div class="progress-text" id="progress-txt">Aprendido: 0%</div>
+        <div class="bar-bg"><div class="bar-fill" id="bar"></div></div>
+    </div>
 
-    <div class="card-container" onclick="flipCard()">
-        <div class="card" id="flashcard">
-            <div class="card-face">
-                <img id="card-img" src="" alt="Cargando...">
-                <div class="word" id="card-word">...</div>
-                <div class="sentence" id="card-sentence">...</div>
-                <p style="color: #94a3b8; font-size: 0.8em;">Toca para ver traducción</p>
+    <div class="card-container" onclick="toggleFlip()">
+        <div class="card" id="card">
+            <div class="face">
+                <div class="img-box"><img id="c-img" src="" alt=""></div>
+                <div class="word-en" id="c-word">Cargando...</div>
+                <div class="sentence-en" id="c-sent">...</div>
             </div>
-            <div class="card-back card-face">
-                <h3>Traducción</h3>
-                <div class="word" id="card-trans-word">...</div>
-                <div class="translation" id="card-trans-sentence">...</div>
-                <p style="color: #94a3b8; font-size: 0.8em;">Toca para volver</p>
+            <div class="face face-back">
+                <div style="color: #64748b; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Traducción</div>
+                <div class="word-es" id="c-trans">...</div>
+                <div class="sentence-es" id="c-sent-es">...</div>
             </div>
         </div>
     </div>
 
     <div class="controls">
-        <button class="btn-speak" onclick="event.stopPropagation(); speak()">🔊 Escuchar de nuevo</button>
-        <button class="btn-hard" onclick="event.stopPropagation(); handleAnswer(false)">❌ Difícil (Repetir pronto)</button>
-        <button class="btn-easy" onclick="event.stopPropagation(); handleAnswer(true)">✅ Fácil (Dominada)</button>
+        <button class="btn-hard" onclick="answer(false)">REPETIR</button>
+        <button class="btn-easy" onclick="answer(true)">LO SÉ</button>
     </div>
+    <button class="btn-audio" onclick="speak()">🔊 ESCUCHAR</button>
 
     <script>
-        // OPCIÓN B: Lista inicial de Refold (Simplificada a 5 ejemplos, pero estructurada para 100)
-        const initialDeck = [
-            { word: "Time", translation: "Tiempo", sentence: "I don't have enough time.", sTranslation: "No tengo suficiente tiempo.", img: "https://images.unsplash.com/photo-1508921334172-b68ed335b3dd", level: 0 },
-            { word: "Year", translation: "Año", sentence: "This was a great year.", sTranslation: "Este fue un gran año.", img: "https://images.unsplash.com/photo-1583339793403-3d9b001b6008", level: 0 },
-            { word: "People", translation: "Gente", sentence: "There are many people here.", sTranslation: "Hay mucha gente aquí.", img: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1", level: 0 },
-            { word: "Way", translation: "Camino / Manera", sentence: "This is the right way.", sTranslation: "Este es el camino correcto.", img: "https://images.unsplash.com/photo-1470770841072-f978cf4d019e", level: 0 },
-            { word: "Day", translation: "Día", sentence: "Have a nice day!", sTranslation: "¡Que tengas un buen día!", img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb", level: 0 }
-            // Aquí puedes seguir pegando hasta llegar a 1000
+        const rawDeck = [
+            { w: "Life", t: "Vida", s: "Life is a beautiful journey.", st: "La vida es un viaje hermoso.", i: "https://images.unsplash.com/photo-1500622764614-be3c178304c1?w=400" },
+            { w: "World", t: "Mundo", s: "Travel around the world.", st: "Viajar por todo el mundo.", i: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400" },
+            { w: "Work", t: "Trabajo", s: "I have a lot of work today.", st: "Tengo mucho trabajo hoy.", i: "https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?w=400" },
+            { w: "House", t: "Casa", s: "This is my new house.", st: "Esta es mi nueva casa.", i: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=400" },
+            { w: "Think", t: "Pensar", s: "I think you are right.", st: "Pienso que tienes razón.", i: "https://images.unsplash.com/photo-1494173853739-c21f58b16055?w=400" },
+            { w: "Change", t: "Cambio", s: "Change is always good.", st: "El cambio siempre es bueno.", i: "https://images.unsplash.com/photo-1501139083538-0139583c060f?w=400" },
+            { w: "Light", t: "Luz", s: "The light is very bright.", st: "La luz es muy brillante.", i: "https://images.unsplash.com/photo-1467810563316-b5476525c0f9?w=400" }
         ];
 
-        let deck = JSON.parse(localStorage.getItem('refold_deck')) || initialDeck;
-        let currentIndex = 0;
+        let deck = JSON.parse(localStorage.getItem('refold_v2')) || rawDeck.map(item => ({...item, level: 0}));
+        let index = 0;
+        const synth = window.speechSynthesis;
 
-        function updateUI() {
-            const item = deck[currentIndex];
-            document.getElementById('card-word').innerText = item.word;
-            document.getElementById('card-sentence').innerText = item.sentence;
-            document.getElementById('card-img').src = item.img;
-            document.getElementById('card-trans-word').innerText = item.translation;
-            document.getElementById('card-trans-sentence').innerText = item.sTranslation;
+        function update() {
+            const item = deck[index];
+            const card = document.getElementById('card');
             
-            // Actualizar Progreso
-            const mastered = deck.filter(c => c.level > 0).length;
-            document.getElementById('stats').innerText = `Dominadas: ${mastered} / ${deck.length}`;
-            document.getElementById('progress-bar').style.width = `${(mastered / deck.length) * 100}%`;
+            // 1. Resetear visuales para evitar lag de imagen anterior
+            card.classList.remove('is-flipped');
+            document.getElementById('c-img').style.opacity = 0;
             
-            document.getElementById('flashcard').classList.remove('is-flipped');
-            
-            // Auto-reproducir voz al cambiar (opcional)
-            setTimeout(speak, 500);
+            setTimeout(() => {
+                document.getElementById('c-word').innerText = item.w;
+                document.getElementById('c-sent').innerText = item.s;
+                document.getElementById('c-trans').innerText = item.t;
+                document.getElementById('c-sent-es').innerText = item.st;
+                document.getElementById('c-img').src = item.i;
+                document.getElementById('c-img').onload = () => document.getElementById('c-img').style.opacity = 1;
+                
+                // Progreso
+                const done = deck.filter(c => c.level > 0).length;
+                const perc = Math.round((done / deck.length) * 100);
+                document.getElementById('bar').style.width = perc + "%";
+                document.getElementById('progress-txt').innerText = `Aprendido: ${perc}%`;
+                
+                speak();
+            }, 300); // Pequeña espera para que la tarjeta termine de voltearse al frente
         }
 
-        function flipCard() {
-            document.getElementById('flashcard').classList.toggle('is-flipped');
-        }
+        function toggleFlip() { document.getElementById('card').classList.toggle('is-flipped'); }
 
-        // OPCIÓN C: Lógica de Repetición Espaciada simple
-        function handleAnswer(isEasy) {
-            if (isEasy) {
-                deck[currentIndex].level += 1;
-                // Mover al final para que no aparezca pronto
-                const item = deck.splice(currentIndex, 1)[0];
+        function answer(easy) {
+            event.stopPropagation();
+            if(easy) {
+                deck[index].level++;
+                const item = deck.splice(index, 1)[0];
                 deck.push(item);
             } else {
-                deck[currentIndex].level = 0;
-                // Mover solo unos puestos adelante para verla pronto
-                const item = deck.splice(currentIndex, 1)[0];
-                deck.splice(5, 0, item); 
+                deck[index].level = 0;
+                const item = deck.splice(index, 1)[0];
+                deck.splice(2, 0, item); // Aparece muy pronto
             }
-            
-            localStorage.setItem('refold_deck', JSON.stringify(deck));
-            updateUI();
+            localStorage.setItem('refold_v2', JSON.stringify(deck));
+            update();
         }
 
         function speak() {
-            const item = deck[currentIndex];
-            window.speechSynthesis.cancel(); // Detener audios previos
-            const msgWord = new SpeechSynthesisUtterance(item.word);
-            const msgSentence = new SpeechSynthesisUtterance(item.sentence);
-            msgWord.lang = 'en-US';
-            msgSentence.lang = 'en-US';
-            msgWord.rate = 0.8;
-            msgSentence.rate = 0.8;
-
-            window.speechSynthesis.speak(msgWord);
-            msgWord.onend = () => {
-                setTimeout(() => window.speechSynthesis.speak(msgSentence), 400);
-            };
+            synth.cancel();
+            const item = deck[index];
+            const w = new SpeechSynthesisUtterance(item.w);
+            const s = new SpeechSynthesisUtterance(item.s);
+            w.lang = s.lang = 'en-US';
+            w.rate = 0.8;
+            s.rate = 0.8;
+            
+            synth.speak(w);
+            w.onend = () => setTimeout(() => synth.speak(s), 300);
         }
 
-        updateUI();
+        // Inicializar voces (Fix para algunos navegadores)
+        window.onload = () => {
+            update();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = () => {}; 
+            }
+        };
     </script>
 </body>
 </html>
