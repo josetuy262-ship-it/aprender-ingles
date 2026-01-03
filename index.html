@@ -9,200 +9,226 @@
     <style>
         :root { --bg: #05070a; --card: #111827; --accent: #6366f1; --success: #10b981; --text: #f8fafc; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; height: 100vh; overflow: hidden; }
-        nav { width: 260px; background: #0f172a; border-right: 1px solid rgba(255,255,255,0.05); padding: 20px; display: flex; flex-direction: column; overflow-y: auto; }
-        .nav-item { padding: 12px; border-radius: 12px; cursor: pointer; margin-bottom: 5px; color: #94a3b8; font-weight: 600; transition: 0.2s; border: 1px solid transparent; }
-        .nav-item.active { background: rgba(99, 102, 241, 0.1); color: white; border-color: var(--accent); }
-        .nav-item.special { background: linear-gradient(90deg, #6366f1, #a855f7); color: white; margin-top: 10px; }
+        
+        /* Menu Lateral SIEMPRE VISIBLE */
+        nav { width: 280px; background: #0f172a; border-right: 2px solid #1e293b; padding: 20px; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; }
+        .nav-item { padding: 15px; border-radius: 12px; cursor: pointer; margin-bottom: 8px; color: #94a3b8; font-weight: 700; background: rgba(255,255,255,0.02); transition: 0.3s; border: 1px solid transparent; }
+        .nav-item.active { background: var(--accent); color: white; border-color: #818cf8; }
+        .nav-item.special { background: #fbbf24; color: #000; }
+
+        /* Contenido */
         main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        #dashboard-view { display: none; width: 90%; max-width: 500px; }
-        .stat-box { background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; }
-        .card-container { perspective: 1200px; width: 340px; height: 480px; }
-        .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); transform-style: preserve-3d; cursor: pointer; }
+        .view { display: none; flex-direction: column; align-items: center; width: 100%; }
+        .view.active { display: flex; }
+
+        /* Tarjeta */
+        .card-container { perspective: 1200px; width: 340px; height: 480px; margin: 20px 0; }
+        .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; }
         .card.is-flipped { transform: rotateY(180deg); }
         .face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 40px; padding: 30px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; background: var(--card); border: 1px solid rgba(255,255,255,0.1); }
         .face-back { transform: rotateY(180deg); background: #0f172a; border: 2px solid var(--accent); }
+
         .img-box { width: 100%; height: 220px; border-radius: 25px; overflow: hidden; margin-bottom: 25px; background: #000; }
         img { width: 100%; height: 100%; object-fit: cover; }
-        .word { font-size: 32px; font-weight: 800; text-align: center; }
-        .sentence { font-size: 17px; color: #94a3b8; margin-top: 15px; text-align: center; font-style: italic; }
-        .controls { display: flex; gap: 15px; width: 340px; margin-top: 30px; }
-        .btn { flex: 1; padding: 20px; border: none; border-radius: 25px; font-weight: 800; cursor: pointer; transition: 0.2s; }
-        .btn-skip { background: #1e293b; color: #94a3b8; }
-        .btn-next { background: var(--accent); color: white; }
-        #overlay { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+        .word { font-size: 32px; font-weight: 800; }
+        .sentence { font-size: 18px; color: #94a3b8; margin-top: 15px; text-align: center; font-style: italic; }
+
+        /* Botones */
+        .controls { display: flex; gap: 15px; width: 340px; }
+        .btn { flex: 1; padding: 20px; border: none; border-radius: 25px; font-weight: 800; cursor: pointer; font-size: 1rem; color: white; }
+        .btn-repeat { background: #334155; }
+        .btn-next { background: var(--accent); }
+
+        /* Pantalla Inicio */
+        #overlay { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
     <div id="overlay">
-        <h1 style="font-size: 2.5rem; margin-bottom: 30px;">Refold Mastery</h1>
-        <button style="background:var(--accent); color:white; padding:20px 50px; border-radius:50px; border:none; font-weight:800; cursor:pointer;" onclick="startApp()">INICIAR REPASO</button>
+        <h1 style="font-size: 3rem; margin-bottom: 20px;">Refold Journey</h1>
+        <button onclick="iniciar()" style="padding: 20px 60px; border-radius: 50px; background: var(--accent); color: white; border: none; font-size: 1.5rem; font-weight: 800; cursor: pointer;">COMENZAR REPASO</button>
     </div>
 
-    <nav id="sidebar">
-        <div style="font-weight: 800; color: var(--accent); margin-bottom: 20px;">MENU</div>
-        <div class="nav-item active" onclick="changeView('study')">📖 Estudiar</div>
-        <div class="nav-item" onclick="changeView('stats')">📊 Progreso</div>
-        <div style="height: 1px; background: rgba(255,255,255,0.05); margin: 15px 0;"></div>
-        <div id="deck-list"></div>
+    <nav>
+        <div style="font-size: 1.5rem; font-weight: 800; margin-bottom: 30px; color: var(--accent);">REFOLD PRO</div>
+        <div id="menu-items">
+            </div>
+        <div style="margin-top: auto;">
+            <div class="nav-item" onclick="cambiarVista('stats')">📊 Mi Progreso</div>
+        </div>
     </nav>
 
     <main>
-        <div id="study-view" style="display: flex; flex-direction: column; align-items: center;">
-            <div id="streak-label" style="color: #fbbf24; font-weight: 800; margin-bottom: 10px;">🔥 Racha: 0 días</div>
-            <div id="counter-label" style="font-size: 0.8rem; color: #475569; margin-bottom: 10px;">Tarjeta 1 de 125</div>
+        <div id="study-view" class="view active">
+            <div id="streak-info" style="color: #fbbf24; font-weight: 800; margin-bottom: 10px;">🔥 Racha: 0 días</div>
             <div class="card-container">
                 <div class="card" id="card" onclick="this.classList.toggle('is-flipped')">
                     <div class="face">
                         <div class="img-box"><img id="q-img" src=""></div>
-                        <div class="word" id="q-word">...</div>
+                        <div class="word" id="q-word">Cargando...</div>
                         <div class="sentence" id="q-sent">...</div>
                     </div>
                     <div class="face face-back">
-                        <div style="font-size: 0.7rem; color: var(--accent); margin-bottom: 15px;">TRADUCCIÓN</div>
+                        <div style="color: var(--accent); font-weight: 800; margin-bottom: 20px;">TRADUCCIÓN</div>
                         <div class="word" id="a-word" style="color: var(--success);">...</div>
                         <div class="sentence" id="a-sent" style="color: white;">...</div>
                     </div>
                 </div>
             </div>
             <div class="controls">
-                <button class="btn btn-skip" onclick="answer(false)">REPETIR</button>
-                <button class="btn btn-next" onclick="answer(true)">LO TENGO</button>
+                <button class="btn btn-repeat" onclick="responder(false)">REPETIR</button>
+                <button class="btn btn-next" onclick="responder(true)">¡LO TENGO!</button>
             </div>
         </div>
 
-        <div id="dashboard-view">
-            <div class="stat-box"><canvas id="myChart"></canvas></div>
-            <div class="stat-box" style="text-align: center;">
-                <h2 id="total-learned" style="margin: 0; color: var(--success); font-size: 2.5rem;">0</h2>
-                <p style="color: #94a3b8; margin: 5px 0 0 0;">Tarjetas completadas hoy</p>
+        <div id="stats-view" class="view">
+            <div style="background: var(--card); padding: 30px; border-radius: 30px; width: 90%; max-width: 500px;">
+                <canvas id="grafica"></canvas>
+                <h2 id="total-hoy" style="text-align: center; margin-top: 20px; font-size: 3rem;">0</h2>
+                <p style="text-align: center; color: #94a3b8;">Tarjetas hoy</p>
+                <button onclick="cambiarVista('study')" style="width: 100%; padding: 15px; border-radius: 15px; border: none; background: var(--accent); color: white; font-weight: 800; margin-top: 20px; cursor: pointer;">VOLVER A ESTUDIAR</button>
             </div>
         </div>
     </main>
 
     <script>
-        // MAZOS UNIFICADOS
-        const allDecks = {
-            1: [
-                { w: "Actually", t: "En realidad", s: "Actually, it is true.", st: "En realidad, es verdad.", i: "https://picsum.photos/seed/act/400/300" },
-                { w: "Development", t: "Desarrollo", s: "Focus on development.", st: "Enfócate en el desarrollo.", i: "https://picsum.photos/seed/dev/400/300" },
-                { w: "Available", t: "Disponible", s: "Is it available?", st: "¿Está disponible?", i: "https://picsum.photos/seed/ava/400/300" }
-            ],
+        // DATOS (Aquí meteremos las 1000 divididas por bloques)
+        const mazos = {
             "repaso_sabado": [
-                { w: "Weekend", t: "Fin de semana", s: "Enjoy your weekend.", st: "Disfruta tu fin de semana.", i: "https://picsum.photos/seed/week/400/300" }
-            ]
+                { w: "Actually", t: "En realidad", s: "Actually, it's very easy.", st: "En realidad, es muy fácil.", i: "https://picsum.photos/seed/1/400/300" },
+                { w: "Development", t: "Desarrollo", s: "Focus on development.", st: "Enfócate en el desarrollo.", i: "https://picsum.photos/seed/2/400/300" },
+                { w: "Knowledge", t: "Conocimiento", s: "Knowledge is power.", st: "El conocimiento es poder.", i: "https://picsum.photos/seed/3/400/300" }
+            ],
+            "mazo_1": [{ w: "Example", t: "Ejemplo", s: "This is an example.", st: "Este es un ejemplo.", i: "https://picsum.photos/seed/4/400/300" }]
         };
 
-        // Generar mazos vacíos para el menú
-        for(let i=2; i<=10; i++) if(!allDecks[i]) allDecks[i] = [...allDecks[1]];
-
-        let db = JSON.parse(localStorage.getItem('refold_v12_db')) || {
-            currentDeck: "repaso_sabado", index: 0, streak: 0, lastDate: "", history: [0, 0, 0, 0, 0, 0, 0]
+        let datos = JSON.parse(localStorage.getItem('refold_vFinal')) || {
+            mazoActual: "repaso_sabado",
+            indice: 0,
+            racha: 0,
+            ultimaVez: "",
+            historial: [0, 0, 0, 0, 0, 0, 0]
         };
 
+        const locutor = window.speechSynthesis;
         let chart;
-        const synth = window.speechSynthesis;
 
-        function startApp() {
+        function iniciar() {
             document.getElementById('overlay').style.display = 'none';
-            updateMenu();
-            render();
-            initChart();
-            updateStreak();
+            // Desbloquear sonido en Windows
+            locutor.cancel();
+            const dummy = new SpeechSynthesisUtterance("Start");
+            dummy.volume = 0;
+            locutor.speak(dummy);
+
+            actualizarRacha();
+            dibujarMenu();
+            mostrarTarjeta();
+            initGrafica();
         }
 
-        function updateMenu() {
-            const list = document.getElementById('deck-list');
-            list.innerHTML = '';
+        function dibujarMenu() {
+            const menu = document.getElementById('menu-items');
+            menu.innerHTML = "";
             
-            // Botón Especial Sábado/Domingo (Prioritario)
-            const day = new Date().getDay();
-            if(day === 6 || day === 0) {
-                const spec = document.createElement('div');
-                spec.className = `nav-item special ${db.currentDeck.includes('repaso') ? 'active' : ''}`;
-                spec.innerHTML = `⭐ REPASO ${day === 6 ? 'SÁBADO' : 'DOMINGO'}`;
-                spec.onclick = () => { db.currentDeck = day === 6 ? "repaso_sabado" : "repaso_domingo"; db.index = 0; render(); changeView('study'); };
-                list.appendChild(spec);
+            // Botón Sábado (Solo si es sábado)
+            if(new Date().getDay() === 6) {
+                const b = crearBoton("⭐ REPASO SÁBADO", "repaso_sabado");
+                b.classList.add('special');
+                menu.appendChild(b);
             }
 
+            // Mazos del 1 al 10
             for(let i=1; i<=10; i++) {
-                const item = document.createElement('div');
-                item.className = `nav-item ${db.currentDeck == i ? 'active' : ''}`;
-                item.innerHTML = `Mazo ${i}`;
-                item.onclick = () => { db.currentDeck = i; db.index = 0; render(); changeView('study'); };
-                list.appendChild(item);
+                const id = "mazo_" + i;
+                menu.appendChild(crearBoton("📦 Mazo " + i, id));
             }
         }
 
-        function render() {
-            const deck = allDecks[db.currentDeck] || allDecks[1];
-            const item = deck[db.index % deck.length];
-            
-            document.getElementById('q-word').innerText = item.w;
-            document.getElementById('q-sent').innerText = item.s;
-            document.getElementById('a-word').innerText = item.t;
-            document.getElementById('a-sent').innerText = item.st;
-            document.getElementById('q-img').src = item.i;
+        function crearBoton(texto, id) {
+            const div = document.createElement('div');
+            div.className = "nav-item " + (datos.mazoActual === id ? "active" : "");
+            div.innerText = texto;
+            div.onclick = () => { 
+                datos.mazoActual = id; 
+                datos.indice = 0; 
+                dibujarMenu();
+                cambiarVista('study');
+                mostrarTarjeta();
+            };
+            return div;
+        }
+
+        function mostrarTarjeta() {
+            const mazo = mazos[datos.mazoActual] || mazos["repaso_sabado"];
+            const card = mazo[datos.indice % mazo.length];
+
+            document.getElementById('q-word').innerText = card.w;
+            document.getElementById('q-sent').innerText = card.s;
+            document.getElementById('a-word').innerText = card.t;
+            document.getElementById('a-sent').innerText = card.st;
+            document.getElementById('q-img').src = card.i;
             document.getElementById('card').classList.remove('is-flipped');
-            document.getElementById('counter-label').innerText = `Tarjeta ${db.index + 1} de 125`;
             
-            speak(`${item.w}. ${item.s}`);
+            // AUDIO FORZADO
+            hablar(`${card.w}. ${card.s}`);
         }
 
-        function speak(text) {
-            synth.cancel();
-            const u = new SpeechSynthesisUtterance(text);
-            u.lang = 'en-US';
-            u.rate = 0.8;
-            synth.speak(u);
+        function hablar(texto) {
+            locutor.cancel();
+            const frase = new SpeechSynthesisUtterance(texto);
+            frase.lang = 'en-US';
+            frase.rate = 0.8;
+            locutor.speak(frase);
         }
 
-        function answer(correct) {
-            if(correct) {
-                db.index++;
-                const dayIdx = (new Date().getDay() + 6) % 7;
-                db.history[dayIdx]++; // Solo suma si es correcto
-                save();
+        function responder(correcto) {
+            if(correcto) {
+                datos.indice++;
+                const dia = (new Date().getDay() + 6) % 7;
+                datos.historial[dia]++;
+                guardar();
             }
-            render();
-            if(chart) updateChart();
+            mostrarTarjeta();
+            if(chart) actualizarGrafica();
         }
 
-        function updateStreak() {
-            const today = new Date().toDateString();
-            if(db.lastDate !== today) {
-                db.streak++;
-                db.lastDate = today;
-                save();
+        function cambiarVista(v) {
+            document.getElementById('study-view').classList.toggle('active', v === 'study');
+            document.getElementById('stats-view').classList.toggle('active', v === 'stats');
+        }
+
+        function actualizarRacha() {
+            const hoy = new Date().toDateString();
+            if(datos.ultimaVez !== hoy) {
+                datos.racha++;
+                datos.ultimaVez = hoy;
+                guardar();
             }
-            document.getElementById('streak-label').innerText = `🔥 Racha: ${db.streak} días`;
+            document.getElementById('streak-info').innerText = `🔥 Racha: ${datos.racha} días`;
         }
 
-        function changeView(v) {
-            document.getElementById('study-view').style.display = v === 'study' ? 'flex' : 'none';
-            document.getElementById('dashboard-view').style.display = v === 'stats' ? 'block' : 'none';
-            updateMenu();
-        }
+        function guardar() { localStorage.setItem('refold_vFinal', JSON.stringify(datos)); }
 
-        function save() { localStorage.setItem('refold_v12_db', JSON.stringify(db)); }
-
-        function initChart() {
-            const ctx = document.getElementById('myChart').getContext('2d');
+        function initGrafica() {
+            const ctx = document.getElementById('grafica').getContext('2d');
             chart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['L', 'M', 'X', 'J', 'V', 'S', 'D'],
-                    datasets: [{ label: 'Tarjetas', data: db.history, backgroundColor: '#6366f1' }]
+                    labels: ['L', 'M', 'M', 'J', 'V', 'S', 'D'],
+                    datasets: [{ label: 'Completadas', data: datos.historial, backgroundColor: '#6366f1' }]
                 },
-                options: { responsive: true }
+                options: { responsive: true, scales: { y: { beginAtZero: true } } }
             });
-            updateChart();
+            actualizarGrafica();
         }
 
-        function updateChart() {
-            chart.data.datasets[0].data = db.history;
+        function actualizarGrafica() {
             chart.update();
-            document.getElementById('total-learned').innerText = db.history[(new Date().getDay() + 6) % 7];
+            const hoyIdx = (new Date().getDay() + 6) % 7;
+            document.getElementById('total-hoy').innerText = datos.historial[hoyIdx];
         }
     </script>
 </body>
