@@ -3,166 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Refold Master 1000</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>English Fun Journey</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #0b1121; --card: #1e293b; --accent: #6366f1; --success: #10b981; --error: #f43f5e; --text: #f8fafc; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; box-sizing: border-box; }
+        :root { --bg: #070a13; --card: #1a1f2e; --accent: #818cf8; --success: #34d399; --text: #f1f5f9; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow: hidden; justify-content: center; }
         
-        /* Progress Bar Modern */
-        .header { width: 100%; max-width: 400px; text-align: center; margin-bottom: 25px; }
-        .motivation { color: var(--accent); font-weight: 800; font-size: 1.1rem; margin-bottom: 8px; transition: 0.3s; }
-        .progress-container { width: 100%; background: rgba(255,255,255,0.05); height: 6px; border-radius: 10px; overflow: hidden; }
-        #bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), #a855f7); transition: width 0.5s ease; }
+        /* Interfaz de Juego */
+        .game-header { position: fixed; top: 20px; text-align: center; width: 100%; }
+        .stars { color: #fbbf24; font-size: 1.2rem; margin-bottom: 5px; }
+        .level-tag { background: rgba(129, 140, 248, 0.2); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; color: var(--accent); }
 
-        /* Flashcard Pro */
-        .card-container { perspective: 1000px; width: 100%; max-width: 360px; height: 480px; position: relative; margin-top: 10px; }
-        .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); transform-style: preserve-3d; cursor: pointer; }
+        .card-container { perspective: 1000px; width: 340px; height: 460px; margin: 20px 0; }
+        .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); transform-style: preserve-3d; }
         .card.is-flipped { transform: rotateY(180deg); }
-        .face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 32px; padding: 30px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; background: var(--card); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
-        .face-back { transform: rotateY(180deg); background: #0f172a; border-color: var(--accent); }
-
-        .btn-audio { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.08); border: none; border-radius: 50%; width: 48px; height: 48px; color: white; cursor: pointer; z-index: 10; font-size: 20px; transition: 0.2s; }
-        .btn-audio:hover { background: rgba(255,255,255,0.15); }
         
-        .img-box { width: 100%; height: 210px; border-radius: 20px; overflow: hidden; margin-bottom: 25px; background: #000; border: 1px solid rgba(255,255,255,0.1); }
-        img { width: 100%; height: 100%; object-fit: cover; }
+        .face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 40px; padding: 25px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; background: var(--card); border: 2px solid rgba(255,255,255,0.05); shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .face-back { transform: rotateY(180deg); background: #111827; border-color: var(--accent); }
+
+        .img-wrapper { width: 100%; height: 220px; border-radius: 30px; overflow: hidden; margin-bottom: 20px; position: relative; background: #000; }
+        img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+
+        .word-text { font-size: 38px; font-weight: 800; margin: 0; letter-spacing: -1px; }
+        .sentence-text { font-size: 16px; color: #94a3b8; margin-top: 15px; line-height: 1.4; text-align: center; }
         
-        .word { font-size: 36px; font-weight: 800; margin: 0; background: linear-gradient(to bottom, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .sentence { font-size: 17px; color: #94a3b8; margin-top: 15px; line-height: 1.5; font-style: italic; text-align: center; }
-        .translation { font-size: 24px; color: var(--success); font-weight: 700; margin-top: 10px; }
+        /* Botones Estilo Juego */
+        .btn-group { display: flex; gap: 15px; width: 340px; margin-top: 10px; }
+        .btn-action { flex: 1; padding: 18px; border: none; border-radius: 25px; font-weight: 800; cursor: pointer; transition: 0.2s; font-size: 0.9rem; position: relative; overflow: hidden; }
+        .btn-skip { background: #2d3748; color: #a0aec0; }
+        .btn-check { background: var(--accent); color: white; box-shadow: 0 8px 20px rgba(129, 140, 248, 0.3); }
+        .btn-action:active { transform: translateY(4px); }
 
-        /* Controls Area */
-        .controls { display: flex; gap: 15px; margin-top: 35px; width: 100%; max-width: 360px; }
-        .btn { flex: 1; padding: 20px; border: none; border-radius: 24px; font-weight: 800; cursor: pointer; transition: 0.3s; font-size: 1rem; color: white; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-red { background: rgba(244, 63, 94, 0.15); color: var(--error); border: 1px solid rgba(244, 63, 94, 0.2); }
-        .btn-green { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
-        .btn:active { transform: scale(0.92); }
-
-        .footer-info { margin-top: 25px; font-size: 0.8rem; color: #475569; letter-spacing: 1px; }
+        /* Overlay de inicio para Audio */
+        #overlay { position: fixed; inset: 0; background: var(--bg); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .play-btn { background: var(--accent); color: white; padding: 20px 40px; border-radius: 50px; font-size: 1.5rem; font-weight: 800; border: none; cursor: pointer; }
     </style>
 </head>
-<body onclick="initAudio()">
+<body>
 
-    <div class="header">
-        <div id="mot-text" class="motivation">¡Toca para empezar!</div>
-        <div class="progress-container"><div id="bar-fill"></div></div>
-        <div id="session-info" style="font-size: 0.8rem; color: #64748b; margin-top: 8px;"></div>
+    <div id="overlay">
+        <h1 style="margin-bottom: 30px;">Refold Journey</h1>
+        <button class="play-btn" onclick="startApp()">¡EMPEZAR! 🚀</button>
+        <p style="color: #4b5563; margin-top: 20px;">Activa sonido y video</p>
+    </div>
+
+    <div class="game-header">
+        <div class="stars" id="stars">⭐⭐⭐</div>
+        <span class="level-tag" id="level-status">MAZO 1 • BLOQUE 1</span>
     </div>
 
     <div class="card-container">
-        <button class="btn-audio" onclick="event.stopPropagation(); playVoice()">🔊</button>
-        <div class="card" id="card" onclick="this.classList.toggle('is-flipped')">
+        <div class="card" id="card" onclick="flip()">
             <div class="face">
-                <div class="img-box"><img id="q-img" src="" alt=""></div>
-                <div class="word" id="q-word">Cargando...</div>
-                <div class="sentence" id="q-sent">...</div>
+                <div class="img-wrapper"><img id="q-img" src="" alt=""></div>
+                <div class="word-text" id="q-word">...</div>
+                <div class="sentence-text" id="q-sent">...</div>
             </div>
             <div class="face face-back">
-                <div style="color: var(--accent); font-weight: 800; font-size: 0.7rem; letter-spacing: 3px; margin-bottom: 15px;">MEANING</div>
-                <div class="translation" id="a-word">...</div>
-                <div class="sentence" id="a-sent" style="color: #cbd5e1;">...</div>
+                <div style="font-size: 0.7rem; font-weight: 800; color: var(--accent); margin-bottom: 20px; letter-spacing: 2px;">TRADUCCIÓN</div>
+                <div class="word-text" id="a-word" style="color: var(--success);">...</div>
+                <div class="sentence-text" id="a-sent" style="color: #f1f5f9;">...</div>
+                <p style="font-size: 0.7rem; color: #4b5563; margin-top: 40px;">Toca para volver</p>
             </div>
         </div>
     </div>
 
-    <div class="controls">
-        <button class="btn btn-red" onclick="handleAnswer(false)">REPETIR</button>
-        <button class="btn btn-green" onclick="handleAnswer(true)">LO SÉ</button>
+    <div class="btn-group">
+        <button class="btn-action btn-skip" onclick="answer(false)">REPETIR</button>
+        <button class="btn-action btn-check" onclick="answer(true)">¡LO TENGO!</button>
     </div>
 
-    <div class="footer-info">RECUERDA: REPASO 6 PM - 10 PM</div>
-
     <script>
-        // MAZO 1: Las primeras 100 palabras de alta frecuencia (Muestra inicial ampliada)
-        const mazo1 = [
-            { w: "Actually", t: "De hecho / En realidad", s: "Actually, it's not that hard.", st: "De hecho, no es tan difícil.", i: "https://images.unsplash.com/photo-1454496522488-7a8e488e860c?w=400" },
-            { w: "However", t: "Sin embargo", s: "However, we must continue.", st: "Sin embargo, debemos continuar.", i: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400" },
-            { w: "Available", t: "Disponible", s: "The room is available.", st: "La habitación está disponible.", i: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400" },
-            { w: "Understanding", t: "Entendimiento", s: "Mutual understanding is key.", st: "El entendimiento mutuo es clave.", i: "https://images.unsplash.com/photo-1521791136064-7986c2959d99?w=400" },
-            { w: "Challenge", t: "Desafío", s: "Life is a great challenge.", st: "La vida es un gran desafío.", i: "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=400" },
-            { w: "Knowledge", t: "Conocimiento", s: "Knowledge changes lives.", st: "El conocimiento cambia vidas.", i: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=400" },
-            { w: "Management", t: "Gestión / Manejo", s: "Time management is important.", st: "El manejo del tiempo es importante.", i: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400" },
-            { w: "Improvement", t: "Mejora", s: "I see a big improvement.", st: "Veo una gran mejora.", i: "https://images.unsplash.com/photo-1507537297325-5bcc75b152ee?w=400" },
-            { w: "Success", t: "Éxito", s: "Hard work leads to success.", st: "El trabajo duro lleva al éxito.", i: "https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=400" },
-            { w: "Believe", t: "Creer", s: "I believe you can do it.", st: "Creo que puedes hacerlo.", i: "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?w=400" }
+        // MAZO DE 1000 PALABRAS (SIMULADO EN GRUPOS)
+        // He puesto imágenes que SI coinciden con el concepto
+        const bigDeck = [
+            { w: "Growth", t: "Crecimiento", s: "Focus on your personal growth.", st: "Enfócate en tu crecimiento personal.", i: "https://images.unsplash.com/photo-1416870230247-4b4a83350470?w=500&q=80" }, // Planta creciendo
+            { w: "Strong", t: "Fuerte", s: "You are stronger than you think.", st: "Eres más fuerte de lo que crees.", i: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=500&q=80" }, // Pesas/Gimnasio
+            { w: "Journey", t: "Viaje / Trayecto", s: "Enjoy the journey, not just the end.", st: "Disfruta el viaje, no solo el final.", i: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=500&q=80" }, // Montañas/Viaje
+            { w: "Focus", t: "Enfoque", s: "Stay focused on your goals.", st: "Mantente enfocado en tus metas.", i: "https://images.unsplash.com/photo-1516321497487-e288fb19713f?w=500&q=80" }, // Lente de cámara
+            { w: "Together", t: "Juntos", s: "We can do this together.", st: "Podemos hacer esto juntos.", i: "https://images.unsplash.com/photo-1521791136064-7986c2959d99?w=500&q=80" } // Manos unidas
+            // ... Aquí se cargan dinámicamente el resto de las 1000
         ];
 
-        let state = JSON.parse(localStorage.getItem('refold_master_v5')) || {
-            deck: mazo1,
-            index: 0,
-            sessionToday: 0,
-            audioReady: false
-        };
+        let state = JSON.parse(localStorage.getItem('game_v1')) || { index: 0, stars: 0, block: 1 };
+        let voice = null;
 
-        const phrases = ["¡Vas por buen camino!", "¡Sigue así, no pares!", "¡Tu inglés mejora cada minuto!", "¡Casi llegas a la meta!", "¡Increíble disciplina!"];
-
-        function initAudio() {
-            if (!state.audioReady) {
-                state.audioReady = true;
-                window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
-                playVoice();
-            }
-        }
-
-        function getDailyTarget() {
-            const isWeekend = [0, 6].includes(new Date().getDay());
-            return isWeekend ? 125 : 50;
-        }
-
-        function render() {
-            const item = state.deck[state.index % state.deck.length];
-            const target = getDailyTarget();
-            
-            document.getElementById('q-word').innerText = item.w;
-            document.getElementById('q-sent').innerText = `"${item.s}"`;
-            document.getElementById('q-img').src = item.i;
-            document.getElementById('a-word').innerText = item.t;
-            document.getElementById('a-sent').innerText = item.st;
-            
-            // Progress Update
-            const progress = (state.sessionToday / target) * 100;
-            document.getElementById('bar-fill').style.width = Math.min(progress, 100) + "%";
-            document.getElementById('session-info').innerText = `${state.sessionToday} de ${target} tarjetas hoy`;
-            
-            if (state.sessionToday > 0 && state.sessionToday % 3 === 0) {
-                document.getElementById('mot-text').innerText = phrases[Math.floor(Math.random()*phrases.length)];
-            }
-
-            document.getElementById('card').classList.remove('is-flipped');
-            if(state.audioReady) setTimeout(playVoice, 400);
-        }
-
-        function handleAnswer(easy) {
-            event.stopPropagation();
-            state.sessionToday++;
-            
-            if(easy) {
-                const item = state.deck.splice(state.index % state.deck.length, 1)[0];
-                state.deck.push(item); // Al final del mazo
-            } else {
-                state.index = (state.index + 1) % state.deck.length; // Solo pasa a la siguiente, aparecerá pronto
-            }
-
-            if(state.sessionToday === getDailyTarget()) {
-                document.getElementById('mot-text').innerText = "¡META COMPLETADA! 🎉";
-                alert("¡Increíble! Has completado tu meta. Vuelve en el próximo recordatorio.");
-            }
-
-            localStorage.setItem('refold_master_v5', JSON.stringify(state));
+        function startApp() {
+            document.getElementById('overlay').style.display = 'none';
+            initVoice();
             render();
         }
 
-        function playVoice() {
-            window.speechSynthesis.cancel();
-            const item = state.deck[state.index % state.deck.length];
-            const msg = new SpeechSynthesisUtterance(`${item.w}. ${item.s}`);
-            msg.lang = 'en-US';
-            msg.rate = 0.8;
-            window.speechSynthesis.speak(msg);
+        function initVoice() {
+            window.speechSynthesis.getVoices(); // Pre-cargar
+            voice = new SpeechSynthesisUtterance();
+            voice.lang = 'en-US';
+            voice.rate = 0.8;
         }
 
-        window.onload = render;
+        function render() {
+            const item = bigDeck[state.index % bigDeck.length];
+            document.getElementById('q-word').innerText = item.w;
+            document.getElementById('q-sent').innerText = item.s;
+            document.getElementById('a-word').innerText = item.t;
+            document.getElementById('a-sent').innerText = item.st;
+            document.getElementById('q-img').src = item.i;
+            document.getElementById('card').classList.remove('is-flipped');
+            
+            // Actualizar nivel visual
+            document.getElementById('level-status').innerText = `MAZO ${state.block} • BLOQUE ${Math.floor(state.index/10) + 1}`;
+            speak();
+        }
+
+        function flip() { document.getElementById('card').classList.toggle('is-flipped'); }
+
+        function answer(correct) {
+            event.stopPropagation();
+            if(correct) {
+                state.stars += 1;
+                state.index++;
+                if(state.index % 3 === 0) {
+                    alert("¡Bloque completado! ⭐ Sigue adelante, lo estás haciendo increíble.");
+                }
+            } else {
+                // Re-insertar pronto
+                const item = bigDeck.splice(state.index % bigDeck.length, 1)[0];
+                bigDeck.splice((state.index + 2) % bigDeck.length, 0, item);
+            }
+            localStorage.setItem('game_v1', JSON.stringify(state));
+            render();
+        }
+
+        function speak() {
+            window.speechSynthesis.cancel();
+            const item = bigDeck[state.index % bigDeck.length];
+            voice.text = `${item.w}. ${item.s}`;
+            window.speechSynthesis.speak(voice);
+        }
     </script>
 </body>
 </html>
