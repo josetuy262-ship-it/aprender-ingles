@@ -3,162 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Refold 1000 - Mastery Edition</title>
+    <title>Refold Journey 1000 - Parte 1</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --bg: #05070a; --card: #111827; --accent: #6366f1; --success: #10b981; --text: #f8fafc; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; height: 100vh; overflow: hidden; }
-        
-        /* Navegación Lateral */
-        nav { width: 280px; background: #0f172a; border-right: 2px solid #1e293b; padding: 20px; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; }
-        .nav-item { padding: 15px; border-radius: 12px; cursor: pointer; margin-bottom: 8px; color: #94a3b8; font-weight: 700; background: rgba(255,255,255,0.02); transition: 0.2s; }
-        .nav-item.active { background: var(--accent); color: white; }
-        .nav-item.special { border: 2px solid #fbbf24; color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
-
-        /* Área de Estudio */
-        main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .card-container { perspective: 1200px; width: 340px; height: 480px; margin-bottom: 20px; }
+        nav { width: 280px; background: #0f172a; border-right: 2px solid #1e293b; padding: 20px; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; overflow-y: auto; }
+        .nav-item { padding: 15px; border-radius: 12px; cursor: pointer; margin-bottom: 8px; color: #94a3b8; font-weight: 700; background: rgba(255,255,255,0.02); transition: 0.3s; border: 1px solid transparent; }
+        .nav-item.active { background: var(--accent); color: white; border-color: #818cf8; }
+        .nav-item.special { background: #fbbf24; color: #000; border: none; }
+        main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        .card-container { perspective: 1200px; width: 340px; height: 480px; margin: 20px 0; }
         .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; }
         .card.is-flipped { transform: rotateY(180deg); }
-        .face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 40px; padding: 30px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; background: var(--card); border: 1px solid rgba(255,255,255,0.1); }
+        .face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 40px; padding: 30px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; background: var(--card); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         .face-back { transform: rotateY(180deg); background: #0f172a; border: 2px solid var(--accent); }
-
         .img-box { width: 100%; height: 220px; border-radius: 25px; overflow: hidden; margin-bottom: 25px; background: #000; }
         img { width: 100%; height: 100%; object-fit: cover; }
-
         .word { font-size: 32px; font-weight: 800; text-align: center; }
-        .sentence { font-size: 16px; color: #94a3b8; margin-top: 15px; text-align: center; font-style: italic; }
-
+        .sentence { font-size: 17px; color: #94a3b8; margin-top: 15px; text-align: center; font-style: italic; }
         .controls { display: flex; gap: 15px; width: 340px; }
-        .btn { flex: 1; padding: 20px; border: none; border-radius: 25px; font-weight: 800; cursor: pointer; color: white; }
-        
-        #overlay { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .btn { flex: 1; padding: 20px; border: none; border-radius: 25px; font-weight: 800; cursor: pointer; color: white; transition: 0.2s; }
+        .btn-repeat { background: #334155; }
+        .btn-next { background: var(--accent); }
+        #overlay { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
-
     <div id="overlay">
-        <h1 style="font-size: 2.5rem; margin-bottom: 20px;">Refold Mastery</h1>
-        <button onclick="start()" style="padding: 20px 60px; border-radius: 50px; background: var(--accent); color: white; border: none; font-weight: 800; cursor: pointer;">CARGAR SISTEMA</button>
+        <h1 style="font-size: 3rem; margin-bottom: 20px;">Refold Mastery</h1>
+        <button onclick="iniciar()" style="padding: 20px 60px; border-radius: 50px; background: var(--accent); color: white; border: none; font-size: 1.5rem; font-weight: 800; cursor: pointer;">INICIAR SISTEMA</button>
     </div>
 
-    <nav id="menu">
-        <div style="font-weight: 800; color: var(--accent); margin-bottom: 20px;">MIS MAZOS</div>
-        <div id="deck-list"></div>
-    </nav>
+    <nav><div style="font-size: 1.5rem; font-weight: 800; margin-bottom: 30px; color: var(--accent);">REFOLD PRO</div><div id="menu-items"></div></nav>
 
     <main>
-        <div id="study-ui" style="display: flex; flex-direction: column; align-items: center;">
-            <div id="streak-tag" style="color: #fbbf24; font-weight: 800; margin-bottom: 10px;">🔥 Racha: 0 días</div>
-            <div id="progress-tag" style="color: #475569; font-size: 0.9rem; margin-bottom: 10px;">Cargando...</div>
-            
-            <div class="card-container">
-                <div class="card" id="card" onclick="this.classList.toggle('is-flipped')">
-                    <div class="face">
-                        <div class="img-box"><img id="q-img" src=""></div>
-                        <div class="word" id="q-word">...</div>
-                        <div class="sentence" id="q-sent">...</div>
-                    </div>
-                    <div class="face face-back">
-                        <div style="color: var(--accent); font-weight: 800; margin-bottom: 15px;">ESPAÑOL</div>
-                        <div class="word" id="a-word" style="color: var(--success);">...</div>
-                        <div class="sentence" id="a-sent" style="color: white;">...</div>
-                    </div>
+        <div id="streak-info" style="color: #fbbf24; font-weight: 800; margin-bottom: 10px;">🔥 Racha: 0 días</div>
+        <div id="progress-tag" style="color: #475569; font-size: 0.9rem; margin-bottom: 10px;">...</div>
+        <div class="card-container">
+            <div class="card" id="card" onclick="this.classList.toggle('is-flipped')">
+                <div class="face">
+                    <div class="img-box"><img id="q-img" src=""></div>
+                    <div class="word" id="q-word">...</div>
+                    <div class="sentence" id="q-sent">...</div>
+                </div>
+                <div class="face face-back">
+                    <div style="color: var(--accent); font-weight: 800; margin-bottom: 20px;">ESPAÑOL</div>
+                    <div class="word" id="a-word" style="color: var(--success);">...</div>
+                    <div class="sentence" id="a-sent" style="color: white;">...</div>
                 </div>
             </div>
-
-            <div class="controls">
-                <button class="btn" style="background: #334155;" onclick="answer(false)">REPETIR</button>
-                <button class="btn" style="background: var(--accent);" onclick="answer(true)">LO TENGO</button>
-            </div>
+        </div>
+        <div class="controls">
+            <button class="btn btn-repeat" onclick="responder(false)">REPETIR</button>
+            <button class="btn btn-next" onclick="responder(true)">¡LO TENGO!</button>
         </div>
     </main>
 
     <script>
-        // BASE DE DATOS DE 1000 PALABRAS (ESTRUCTURA)
         const data = {
-            "repaso_sabado": [], // No toques esto, se llena solo abajo
+            "repaso_sabado": [],
             1: [
-                { w: "Actually", t: "En realidad", s: "Actually, it's very easy.", st: "En realidad, es muy fácil.", i: "https://picsum.photos/seed/1/400/300" },
-                { w: "Development", t: "Desarrollo", s: "Focus on development.", st: "Enfócate en el desarrollo.", i: "https://picsum.photos/seed/2/400/300" },
-                { w: "Requirement", t: "Requisito", s: "It's a basic requirement.", st: "Es un requisito básico.", i: "https://picsum.photos/seed/3/400/300" },
-                { w: "Knowledge", t: "Conocimiento", s: "Knowledge is power.", st: "El conocimiento es poder.", i: "https://picsum.photos/seed/4/400/300" },
-                { w: "Environment", t: "Medio ambiente", s: "Protect the environment.", st: "Protege el medio ambiente.", i: "https://picsum.photos/seed/5/400/300" },
-                { w: "Improvement", t: "Mejora", s: "I see a big improvement.", st: "Veo una gran mejora.", i: "https://picsum.photos/seed/6/400/300" },
-                { w: "Available", t: "Disponible", s: "Is this seat available?", st: "¿Está este asiento disponible?", i: "https://picsum.photos/seed/7/400/300" },
-                { w: "Challenge", t: "Desafío", s: "Accept the challenge.", st: "Acepta el desafío.", i: "https://picsum.photos/seed/8/400/300" },
-                { w: "Growth", t: "Crecimiento", s: "The company has fast growth.", st: "La empresa tiene un crecimiento rápido.", i: "https://picsum.photos/seed/9/400/300" },
-                { w: "Income", t: "Ingresos", s: "His income is very high.", st: "Sus ingresos son muy altos.", i: "https://picsum.photos/seed/10/400/300" }
+                { w: "Actually", t: "En realidad", s: "Actually, it's very easy.", st: "En realidad, es muy fácil.", i: "https://picsum.photos/seed/p1/400/300" },
+                { w: "Available", t: "Disponible", s: "The room is available.", st: "La habitación está disponible.", i: "https://picsum.photos/seed/p2/400/300" },
+                { w: "Successful", t: "Exitoso", s: "He is very successful.", st: "Él es muy exitoso.", i: "https://picsum.photos/seed/p3/400/300" },
+                { w: "Challenge", t: "Desafío", s: "Accept the challenge.", st: "Acepta el desafío.", i: "https://picsum.photos/seed/p4/400/300" },
+                { w: "Development", t: "Desarrollo", s: "Software development is fun.", st: "El desarrollo de software es divertido.", i: "https://picsum.photos/seed/p5/400/300" }
             ],
-            2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: []
+            2: [
+                { w: "Improvement", t: "Mejora", s: "There is a big improvement.", st: "Hay una gran mejora.", i: "https://picsum.photos/seed/p6/400/300" },
+                { w: "Knowledge", t: "Conocimiento", s: "Knowledge is power.", st: "El conocimiento es poder.", i: "https://picsum.photos/seed/p7/400/300" },
+                { w: "Performance", t: "Rendimiento", s: "High performance team.", st: "Equipo de alto rendimiento.", i: "https://picsum.photos/seed/p8/400/300" }
+            ],
+            3: [
+                { w: "Relationship", t: "Relación", s: "A long relationship.", st: "Una relación larga.", i: "https://picsum.photos/seed/p9/400/300" },
+                { w: "Solution", t: "Solución", s: "Find a solution.", st: "Encuentra una solución.", i: "https://picsum.photos/seed/p10/400/300" }
+            ],
+            // Los siguientes se rellenan automáticamente en la Parte 2
+            4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: []
+        };4: [
+                { w: "Agreement", t: "Acuerdo", s: "They signed the agreement.", st: "Ellos firmaron el acuerdo.", i: "https://picsum.photos/seed/p11/400/300" },
+                { w: "Benefit", t: "Beneficio", s: "This has many benefits.", st: "Esto tiene muchos beneficios.", i: "https://picsum.photos/seed/p12/400/300" }
+            ],
+            5: [
+                { w: "Environment", t: "Medio ambiente", s: "Respect the environment.", st: "Respeta el medio ambiente.", i: "https://picsum.photos/seed/p13/400/300" },
+                { w: "Experience", t: "Experiencia", s: "I have years of experience.", st: "Tengo años de experiencia.", i: "https://picsum.photos/seed/p14/400/300" }
+            ],
+            6: [{ w: "Goal", t: "Meta", s: "Reach your goals.", st: "Alcanza tus metas.", i: "https://picsum.photos/seed/p15/400/300" }],
+            7: [{ w: "Health", t: "Salud", s: "Health is wealth.", st: "La salud es riqueza.", i: "https://picsum.photos/seed/p16/400/300" }],
+            8: [{ w: "Income", t: "Ingresos", s: "Passive income is great.", st: "El ingreso pasivo es genial.", i: "https://picsum.photos/seed/p17/400/300" }],
+            9: [{ w: "Journey", t: "Viaje/Trayecto", s: "Enjoy the journey.", st: "Disfruta el viaje.", i: "https://picsum.photos/seed/p18/400/300" }],
+            10: [{ w: "Quality", t: "Calidad", s: "High quality service.", st: "Servicio de alta calidad.", i: "https://picsum.photos/seed/p19/400/300" }]
         };
 
-        // LLENADO AUTOMÁTICO DE LOS 10 MAZOS (1000 PALABRAS TOTAL)
+        // --- MOTOR LÓGICO ---
+
+        // Auto-relleno para asegurar las 1000 tarjetas
         for (let m = 1; m <= 10; m++) {
             if (data[m].length < 100) {
-                let inicio = data[m].length;
-                for (let i = inicio; i < 100; i++) {
+                let actual = data[m].length;
+                for (let i = actual; i < 100; i++) {
                     data[m].push({
                         w: `Word ${i + 1} (Mazo ${m})`,
                         t: `Palabra ${i + 1}`,
                         s: `Example sentence for word ${i + 1}.`,
                         st: `Oración de ejemplo para la palabra ${i + 1}.`,
-                        i: `https://picsum.photos/seed/m${m}img${i}/400/300`
+                        i: `https://picsum.photos/seed/m${m}i${i}/400/300`
                     });
                 }
             }
         }
-
-        // REPASO DEL SÁBADO: Toma las 100 del mazo 1 y 25 del mazo 2
+        
+        // Configuración especial de REPASO SÁBADO (125 tarjetas)
         data.repaso_sabado = [...data[1], ...data[2].slice(0, 25)];
 
-        // Rellenar dinámicamente el resto de mazos si están vacíos
-        for(let i=1; i<=10; i++) if(data[i].length === 0) data[i] = [...data.repaso_sabado];
-
-        let state = JSON.parse(localStorage.getItem('refold_master_v1')) || {
-            deck: "repaso_sabado", index: 0, racha: 0, fecha: "", historial: [0, 0, 0, 0, 0, 0, 0]
+        let state = JSON.parse(localStorage.getItem('refold_vFinal_1000')) || {
+            deck: "repaso_sabado", index: 0, racha: 0, fecha: "", historial: [0,0,0,0,0,0,0]
         };
 
         const synth = window.speechSynthesis;
 
-        function start() {
+        function iniciar() {
             document.getElementById('overlay').style.display = 'none';
-            // Desbloqueo de audio para Windows
-            const silent = new SpeechSynthesisUtterance("");
-            synth.speak(silent);
+            synth.cancel(); 
+            const u = new SpeechSynthesisUtterance("");
+            synth.speak(u);
+            dibujarMenu();
+            mostrarTarjeta();
+            actualizarRacha();
+        }
+
+        function dibujarMenu() {
+            const menu = document.getElementById('menu-items');
+            menu.innerHTML = "";
+            const esSabado = new Date().getDay() === 6;
             
-            updateMenu();
-            render();
-            checkStreak();
-        }
-
-        function updateMenu() {
-            const list = document.getElementById('deck-list');
-            list.innerHTML = "";
-            const day = new Date().getDay();
-
-            if(day === 6) { // Sábado
-                const btn = createBtn("⭐ REPASO SÁBADO", "repaso_sabado", true);
-                list.appendChild(btn);
+            if(esSabado) {
+                menu.appendChild(crearBoton("⭐ REPASO SÁBADO", "repaso_sabado", true));
             }
-
             for(let i=1; i<=10; i++) {
-                list.appendChild(createBtn("Mazo " + i, i, false));
+                menu.appendChild(crearBoton("Mazo " + i, i, false));
             }
         }
 
-        function createBtn(txt, id, special) {
+        function crearBoton(txt, id, special) {
             const d = document.createElement('div');
             d.className = `nav-item ${state.deck == id ? 'active' : ''} ${special ? 'special' : ''}`;
             d.innerText = txt;
-            d.onclick = () => { state.deck = id; state.index = 0; updateMenu(); render(); };
+            d.onclick = () => { state.deck = id; state.index = 0; dibujarMenu(); mostrarTarjeta(); };
             return d;
         }
 
-        function render() {
-            const currentDeck = data[state.deck] || data["repaso_sabado"];
-            const item = currentDeck[state.index % currentDeck.length];
+        function mostrarTarjeta() {
+            const mazo = data[state.deck] || data["repaso_sabado"];
+            const item = mazo[state.index % mazo.length];
 
             document.getElementById('q-word').innerText = item.w;
             document.getElementById('q-sent').innerText = item.s;
@@ -166,36 +165,37 @@
             document.getElementById('a-sent').innerText = item.st;
             document.getElementById('q-img').src = item.i;
             document.getElementById('card').classList.remove('is-flipped');
-            document.getElementById('progress-tag').innerText = `Tarjeta ${state.index + 1} de ${currentDeck.length}`;
+            document.getElementById('progress-tag').innerText = `Tarjeta ${state.index + 1} de ${mazo.length}`;
 
-            // VOZ: Palabra + Oración
-            setTimeout(() => {
-                synth.cancel();
-                const u = new SpeechSynthesisUtterance(`${item.w}. ${item.s}`);
-                u.lang = 'en-US';
-                u.rate = 0.8;
-                synth.speak(u);
-            }, 500);
+            hablar(`${item.w}. ${item.s}`);
         }
 
-        function answer(isCorrect) {
-            if(isCorrect) {
+        function hablar(texto) {
+            synth.cancel();
+            const frase = new SpeechSynthesisUtterance(texto);
+            frase.lang = 'en-US';
+            frase.rate = 0.85;
+            synth.speak(frase);
+        }
+
+        function responder(correcto) {
+            if(correcto) {
                 state.index++;
-                const dIdx = (new Date().getDay() + 6) % 7;
-                state.historial[dIdx]++;
-                localStorage.setItem('refold_master_v1', JSON.stringify(state));
+                const hoyIdx = (new Date().getDay() + 6) % 7;
+                state.historial[hoyIdx]++; 
+                localStorage.setItem('refold_vFinal_1000', JSON.stringify(state));
             }
-            render();
+            mostrarTarjeta();
         }
 
-        function checkStreak() {
-            const today = new Date().toDateString();
-            if(state.fecha !== today) {
+        function actualizarRacha() {
+            const hoy = new Date().toDateString();
+            if(state.fecha !== hoy) {
                 state.racha++;
-                state.fecha = today;
-                localStorage.setItem('refold_master_v1', JSON.stringify(state));
+                state.fecha = hoy;
+                localStorage.setItem('refold_vFinal_1000', JSON.stringify(state));
             }
-            document.getElementById('streak-tag').innerText = `🔥 Racha: ${state.racha} días`;
+            document.getElementById('streak-info').innerText = `🔥 Racha: ${state.racha} días`;
         }
     </script>
 </body>
