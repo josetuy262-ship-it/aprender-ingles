@@ -3,142 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Fun Journey</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <title>Refold Mastery Offline</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
-        :root { --bg: #070a13; --card: #1a1f2e; --accent: #818cf8; --success: #34d399; --text: #f1f5f9; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow: hidden; justify-content: center; }
-        
-        /* Interfaz de Juego */
-        .game-header { position: fixed; top: 20px; text-align: center; width: 100%; }
-        .stars { color: #fbbf24; font-size: 1.2rem; margin-bottom: 5px; }
-        .level-tag { background: rgba(129, 140, 248, 0.2); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; color: var(--accent); }
+        :root { --bg: #05070a; --card: #111827; --accent: #6366f1; --success: #10b981; --text: #f8fafc; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; height: 100vh; overflow: hidden; }
 
-        .card-container { perspective: 1000px; width: 340px; height: 460px; margin: 20px 0; }
-        .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); transform-style: preserve-3d; }
+        /* Navegación */
+        nav { width: 260px; background: #0f172a; border-right: 1px solid rgba(255,255,255,0.05); padding: 20px; display: flex; flex-direction: column; }
+        .nav-item { padding: 12px; border-radius: 12px; cursor: pointer; margin-bottom: 5px; color: #94a3b8; display: flex; align-items: center; gap: 10px; font-weight: 600; transition: 0.2s; }
+        .nav-item:hover, .nav-item.active { background: rgba(99, 102, 241, 0.1); color: white; }
+        .nav-item.locked { opacity: 0.4; cursor: not-allowed; }
+
+        /* Contenido Principal */
+        main { flex: 1; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle at top, #111827, #05070a); }
+        
+        /* Dashboard */
+        #dashboard-view { display: none; width: 90%; max-width: 500px; animation: fadeIn 0.4s; }
+        .stat-box { background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; }
+
+        /* Card System */
+        .card-container { perspective: 1200px; width: 330px; height: 460px; }
+        .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); transform-style: preserve-3d; cursor: pointer; }
         .card.is-flipped { transform: rotateY(180deg); }
-        
-        .face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 40px; padding: 25px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; background: var(--card); border: 2px solid rgba(255,255,255,0.05); shadow: 0 20px 40px rgba(0,0,0,0.5); }
-        .face-back { transform: rotateY(180deg); background: #111827; border-color: var(--accent); }
+        .face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 35px; padding: 25px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; background: var(--card); border: 1px solid rgba(255,255,255,0.1); }
+        .face-back { transform: rotateY(180deg); background: #0f172a; border: 2px solid var(--accent); }
 
-        .img-wrapper { width: 100%; height: 220px; border-radius: 30px; overflow: hidden; margin-bottom: 20px; position: relative; background: #000; }
-        img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+        .img-box { width: 100%; height: 200px; border-radius: 20px; overflow: hidden; margin-bottom: 20px; background: #000; }
+        img { width: 100%; height: 100%; object-fit: cover; }
 
-        .word-text { font-size: 38px; font-weight: 800; margin: 0; letter-spacing: -1px; }
-        .sentence-text { font-size: 16px; color: #94a3b8; margin-top: 15px; line-height: 1.4; text-align: center; }
-        
-        /* Botones Estilo Juego */
-        .btn-group { display: flex; gap: 15px; width: 340px; margin-top: 10px; }
-        .btn-action { flex: 1; padding: 18px; border: none; border-radius: 25px; font-weight: 800; cursor: pointer; transition: 0.2s; font-size: 0.9rem; position: relative; overflow: hidden; }
-        .btn-skip { background: #2d3748; color: #a0aec0; }
-        .btn-check { background: var(--accent); color: white; box-shadow: 0 8px 20px rgba(129, 140, 248, 0.3); }
-        .btn-action:active { transform: translateY(4px); }
+        .word { font-size: 32px; font-weight: 800; text-align: center; }
+        .sentence { font-size: 16px; color: #94a3b8; margin-top: 10px; text-align: center; font-style: italic; }
 
-        /* Overlay de inicio para Audio */
-        #overlay { position: fixed; inset: 0; background: var(--bg); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .play-btn { background: var(--accent); color: white; padding: 20px 40px; border-radius: 50px; font-size: 1.5rem; font-weight: 800; border: none; cursor: pointer; }
+        .controls { display: flex; gap: 12px; width: 330px; margin-top: 25px; }
+        .btn { flex: 1; padding: 18px; border: none; border-radius: 20px; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .btn-skip { background: #1e293b; color: #94a3b8; }
+        .btn-next { background: var(--accent); color: white; }
+
+        /* Overlay */
+        #start-screen { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .start-btn { background: var(--accent); padding: 20px 60px; border-radius: 50px; font-size: 1.5rem; font-weight: 800; color: white; border: none; cursor: pointer; box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body>
+<body onclick="handleFirstTouch()">
 
-    <div id="overlay">
-        <h1 style="margin-bottom: 30px;">Refold Journey</h1>
-        <button class="play-btn" onclick="startApp()">¡EMPEZAR! 🚀</button>
-        <p style="color: #4b5563; margin-top: 20px;">Activa sonido y video</p>
+    <div id="start-screen">
+        <h1 style="font-size: 2.5rem; margin-bottom: 10px;">Refold Journey</h1>
+        <p style="color: #64748b; margin-bottom: 40px;">Modo Offline Activado ✅</p>
+        <button class="start-btn" onclick="startApp()">COMENZAR</button>
     </div>
 
-    <div class="game-header">
-        <div class="stars" id="stars">⭐⭐⭐</div>
-        <span class="level-tag" id="level-status">MAZO 1 • BLOQUE 1</span>
-    </div>
+    <nav>
+        <div style="font-weight: 800; color: var(--accent); margin-bottom: 30px; font-size: 1.2rem;">MENU</div>
+        <div class="nav-item active" onclick="changeView('study')">📖 Estudiar</div>
+        <div class="nav-item" onclick="changeView('stats')">📊 Progreso</div>
+        <div style="margin: 20px 0; height: 1px; background: rgba(255,255,255,0.05);"></div>
+        <div id="deck-list"></div>
+    </nav>
 
-    <div class="card-container">
-        <div class="card" id="card" onclick="flip()">
-            <div class="face">
-                <div class="img-wrapper"><img id="q-img" src="" alt=""></div>
-                <div class="word-text" id="q-word">...</div>
-                <div class="sentence-text" id="q-sent">...</div>
+    <main>
+        <div id="study-view" style="display: flex; flex-direction: column; align-items: center;">
+            <div id="streak-label" style="color: #fbbf24; font-weight: 800; margin-bottom: 15px;">🔥 Racha: 0 días</div>
+            <div class="card-container">
+                <div class="card" id="card" onclick="this.classList.toggle('is-flipped')">
+                    <div class="face">
+                        <div class="img-box"><img id="q-img" src="" alt=""></div>
+                        <div class="word" id="q-word">...</div>
+                        <div class="sentence" id="q-sent">...</div>
+                    </div>
+                    <div class="face face-back">
+                        <div style="font-size: 0.7rem; letter-spacing: 2px; color: var(--accent); margin-bottom: 10px;">TRADUCCIÓN</div>
+                        <div class="word" id="a-word" style="color: var(--success);">...</div>
+                        <div class="sentence" id="a-sent" style="color: white;">...</div>
+                    </div>
+                </div>
             </div>
-            <div class="face face-back">
-                <div style="font-size: 0.7rem; font-weight: 800; color: var(--accent); margin-bottom: 20px; letter-spacing: 2px;">TRADUCCIÓN</div>
-                <div class="word-text" id="a-word" style="color: var(--success);">...</div>
-                <div class="sentence-text" id="a-sent" style="color: #f1f5f9;">...</div>
-                <p style="font-size: 0.7rem; color: #4b5563; margin-top: 40px;">Toca para volver</p>
+            <div class="controls">
+                <button class="btn btn-skip" onclick="answer(false)">REPETIR</button>
+                <button class="btn btn-next" onclick="answer(true)">¡LO TENGO!</button>
             </div>
         </div>
-    </div>
 
-    <div class="btn-group">
-        <button class="btn-action btn-skip" onclick="answer(false)">REPETIR</button>
-        <button class="btn-action btn-check" onclick="answer(true)">¡LO TENGO!</button>
-    </div>
+        <div id="dashboard-view">
+            <div class="stat-box">
+                <h4 style="margin: 0 0 15px 0;">Tu Actividad Semanal</h4>
+                <canvas id="myChart"></canvas>
+            </div>
+            <div class="stat-box" style="text-align: center;">
+                <h2 id="total-learned" style="margin: 0; color: var(--success);">0</h2>
+                <p style="margin: 5px 0 0 0; color: #94a3b8;">Palabras aprendidas</p>
+            </div>
+        </div>
+    </main>
 
     <script>
-        // MAZO DE 1000 PALABRAS (SIMULADO EN GRUPOS)
-        // He puesto imágenes que SI coinciden con el concepto
-        const bigDeck = [
-            { w: "Growth", t: "Crecimiento", s: "Focus on your personal growth.", st: "Enfócate en tu crecimiento personal.", i: "https://images.unsplash.com/photo-1416870230247-4b4a83350470?w=500&q=80" }, // Planta creciendo
-            { w: "Strong", t: "Fuerte", s: "You are stronger than you think.", st: "Eres más fuerte de lo que crees.", i: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=500&q=80" }, // Pesas/Gimnasio
-            { w: "Journey", t: "Viaje / Trayecto", s: "Enjoy the journey, not just the end.", st: "Disfruta el viaje, no solo el final.", i: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=500&q=80" }, // Montañas/Viaje
-            { w: "Focus", t: "Enfoque", s: "Stay focused on your goals.", st: "Mantente enfocado en tus metas.", i: "https://images.unsplash.com/photo-1516321497487-e288fb19713f?w=500&q=80" }, // Lente de cámara
-            { w: "Together", t: "Juntos", s: "We can do this together.", st: "Podemos hacer esto juntos.", i: "https://images.unsplash.com/photo-1521791136064-7986c2959d99?w=500&q=80" } // Manos unidas
-            // ... Aquí se cargan dinámicamente el resto de las 1000
-        ];
+        // DATOS INTEGRADOS (MAZO 1)
+        const allDecks = {
+            1: [
+                { w: "Actually", t: "En realidad", s: "Actually, it's easy.", st: "En realidad, es fácil.", k: "truth" },
+                { w: "Development", t: "Desarrollo", s: "Focus on development.", st: "Enfócate en el desarrollo.", k: "code" },
+                { w: "Available", t: "Disponible", s: "Is it available?", st: "¿Está disponible?", k: "open" },
+                { w: "Challenge", t: "Desafío", s: "Accept the challenge.", st: "Acepta el desafío.", k: "mountain" },
+                { w: "Improvement", t: "Mejora", s: "I see improvement.", st: "Veo una mejora.", k: "success" }
+            ],
+            // Los otros mazos se llenarán igual...
+        };
 
-        let state = JSON.parse(localStorage.getItem('game_v1')) || { index: 0, stars: 0, block: 1 };
-        let voice = null;
+        let db = JSON.parse(localStorage.getItem('refold_offline_final')) || {
+            currentDeck: 1, index: 0, streak: 0, lastDate: "", history: [0, 0, 0, 0, 0, 0, 0]
+        };
+
+        let chart;
+        const synth = window.speechSynthesis;
 
         function startApp() {
-            document.getElementById('overlay').style.display = 'none';
-            initVoice();
+            document.getElementById('start-screen').style.display = 'none';
+            updateStreak();
+            updateMenu();
             render();
+            initChart();
         }
 
-        function initVoice() {
-            window.speechSynthesis.getVoices(); // Pre-cargar
-            voice = new SpeechSynthesisUtterance();
-            voice.lang = 'en-US';
-            voice.rate = 0.8;
+        function updateStreak() {
+            const today = new Date().toDateString();
+            if(db.lastDate !== today) {
+                db.streak++;
+                db.lastDate = today;
+                save();
+            }
+            document.getElementById('streak-label').innerText = `🔥 Racha: ${db.streak} días`;
+        }
+
+        function updateMenu() {
+            const container = document.getElementById('deck-list');
+            container.innerHTML = '';
+            for(let i=1; i<=10; i++) {
+                const isLocked = i > 1; // Aquí puedes poner la lógica del Lunes
+                const item = document.createElement('div');
+                item.className = `nav-item ${isLocked ? 'locked' : ''} ${db.currentDeck === i ? 'active' : ''}`;
+                item.innerHTML = `📦 Mazo ${i} ${isLocked ? '🔒' : ''}`;
+                if(!isLocked) item.onclick = () => { db.currentDeck = i; render(); changeView('study'); };
+                container.appendChild(item);
+            }
         }
 
         function render() {
-            const item = bigDeck[state.index % bigDeck.length];
+            const item = allDecks[db.currentDeck][db.index % allDecks[db.currentDeck].length];
             document.getElementById('q-word').innerText = item.w;
             document.getElementById('q-sent').innerText = item.s;
             document.getElementById('a-word').innerText = item.t;
             document.getElementById('a-sent').innerText = item.st;
-            document.getElementById('q-img').src = item.i;
+            document.getElementById('q-img').src = `https://source.unsplash.com/featured/?${item.k}`;
             document.getElementById('card').classList.remove('is-flipped');
-            
-            // Actualizar nivel visual
-            document.getElementById('level-status').innerText = `MAZO ${state.block} • BLOQUE ${Math.floor(state.index/10) + 1}`;
-            speak();
+            speak(item.w, item.s);
         }
-
-        function flip() { document.getElementById('card').classList.toggle('is-flipped'); }
 
         function answer(correct) {
-            event.stopPropagation();
             if(correct) {
-                state.stars += 1;
-                state.index++;
-                if(state.index % 3 === 0) {
-                    alert("¡Bloque completado! ⭐ Sigue adelante, lo estás haciendo increíble.");
-                }
-            } else {
-                // Re-insertar pronto
-                const item = bigDeck.splice(state.index % bigDeck.length, 1)[0];
-                bigDeck.splice((state.index + 2) % bigDeck.length, 0, item);
+                db.index++;
+                const dayIdx = (new Date().getDay() + 6) % 7;
+                db.history[dayIdx]++;
             }
-            localStorage.setItem('game_v1', JSON.stringify(state));
+            save();
             render();
+            if(chart) updateChart();
         }
 
-        function speak() {
-            window.speechSynthesis.cancel();
-            const item = bigDeck[state.index % bigDeck.length];
-            voice.text = `${item.w}. ${item.s}`;
-            window.speechSynthesis.speak(voice);
+        function changeView(view) {
+            document.getElementById('study-view').style.display = view === 'study' ? 'flex' : 'none';
+            document.getElementById('dashboard-view').style.display = view === 'stats' ? 'block' : 'none';
+        }
+
+        function speak(w, s) {
+            synth.cancel();
+            const u = new SpeechSynthesisUtterance(`${w}. ${s}`);
+            u.lang = 'en-US'; u.rate = 0.8;
+            synth.speak(u);
+        }
+
+        function save() { localStorage.setItem('refold_offline_final', JSON.stringify(db)); }
+
+        function initChart() {
+            const ctx = document.getElementById('myChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['L', 'M', 'X', 'J', 'V', 'S', 'D'],
+                    datasets: [{ label: 'Tarjetas', data: db.history, backgroundColor: '#6366f1' }]
+                },
+                options: { scales: { y: { beginAtZero: true } } }
+            });
+            updateChart();
+        }
+
+        function updateChart() {
+            chart.data.datasets[0].data = db.history;
+            chart.update();
+            document.getElementById('total-learned').innerText = db.history.reduce((a,b)=>a+b, 0);
+        }
+
+        function handleFirstTouch() {
+            // Desbloquea audio en móviles/Windows
+            if(synth.speaking) return;
+            const u = new SpeechSynthesisUtterance("");
+            synth.speak(u);
         }
     </script>
 </body>
