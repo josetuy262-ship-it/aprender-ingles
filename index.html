@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Refold Journey 1000 - Parte 1</title>
+    <title>Refold Mastery 1000 - Full</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -80,9 +80,7 @@
                 { w: "Relationship", t: "Relación", s: "A long relationship.", st: "Una relación larga.", i: "https://picsum.photos/seed/p9/400/300" },
                 { w: "Solution", t: "Solución", s: "Find a solution.", st: "Encuentra una solución.", i: "https://picsum.photos/seed/p10/400/300" }
             ],
-            // Los siguientes se rellenan automáticamente en la Parte 2
-            4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: []
-        };4: [
+            4: [
                 { w: "Agreement", t: "Acuerdo", s: "They signed the agreement.", st: "Ellos firmaron el acuerdo.", i: "https://picsum.photos/seed/p11/400/300" },
                 { w: "Benefit", t: "Beneficio", s: "This has many benefits.", st: "Esto tiene muchos beneficios.", i: "https://picsum.photos/seed/p12/400/300" }
             ],
@@ -97,9 +95,6 @@
             10: [{ w: "Quality", t: "Calidad", s: "High quality service.", st: "Servicio de alta calidad.", i: "https://picsum.photos/seed/p19/400/300" }]
         };
 
-        // --- MOTOR LÓGICO ---
-
-        // Auto-relleno para asegurar las 1000 tarjetas
         for (let m = 1; m <= 10; m++) {
             if (data[m].length < 100) {
                 let actual = data[m].length;
@@ -115,7 +110,6 @@
             }
         }
         
-        // Configuración especial de REPASO SÁBADO (125 tarjetas)
         data.repaso_sabado = [...data[1], ...data[2].slice(0, 25)];
 
         let state = JSON.parse(localStorage.getItem('refold_vFinal_1000')) || {
@@ -138,13 +132,8 @@
             const menu = document.getElementById('menu-items');
             menu.innerHTML = "";
             const esSabado = new Date().getDay() === 6;
-            
-            if(esSabado) {
-                menu.appendChild(crearBoton("⭐ REPASO SÁBADO", "repaso_sabado", true));
-            }
-            for(let i=1; i<=10; i++) {
-                menu.appendChild(crearBoton("Mazo " + i, i, false));
-            }
+            if(esSabado) menu.appendChild(crearBoton("⭐ REPASO SÁBADO", "repaso_sabado", true));
+            for(let i=1; i<=10; i++) menu.appendChild(crearBoton("Mazo " + i, i, false));
         }
 
         function crearBoton(txt, id, special) {
@@ -158,7 +147,6 @@
         function mostrarTarjeta() {
             const mazo = data[state.deck] || data["repaso_sabado"];
             const item = mazo[state.index % mazo.length];
-
             document.getElementById('q-word').innerText = item.w;
             document.getElementById('q-sent').innerText = item.s;
             document.getElementById('a-word').innerText = item.t;
@@ -166,7 +154,6 @@
             document.getElementById('q-img').src = item.i;
             document.getElementById('card').classList.remove('is-flipped');
             document.getElementById('progress-tag').innerText = `Tarjeta ${state.index + 1} de ${mazo.length}`;
-
             hablar(`${item.w}. ${item.s}`);
         }
 
@@ -190,11 +177,7 @@
 
         function actualizarRacha() {
             const hoy = new Date().toDateString();
-            if(state.fecha !== hoy) {
-                state.racha++;
-                state.fecha = hoy;
-                localStorage.setItem('refold_vFinal_1000', JSON.stringify(state));
-            }
+            if(state.fecha !== hoy) { state.racha++; state.fecha = hoy; localStorage.setItem('refold_vFinal_1000', JSON.stringify(state)); }
             document.getElementById('streak-info').innerText = `🔥 Racha: ${state.racha} días`;
         }
     </script>
