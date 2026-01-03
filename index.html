@@ -9,57 +9,48 @@
     <style>
         :root { --bg: #05070a; --card: #111827; --accent: #6366f1; --success: #10b981; --text: #f8fafc; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; height: 100vh; overflow: hidden; }
-
-        nav { width: 260px; background: #0f172a; border-right: 1px solid rgba(255,255,255,0.05); padding: 20px; display: flex; flex-direction: column; z-index: 100; }
-        .nav-item { padding: 12px; border-radius: 12px; cursor: pointer; margin-bottom: 5px; color: #94a3b8; display: flex; align-items: center; gap: 10px; font-weight: 600; transition: 0.2s; }
-        .nav-item:hover, .nav-item.active { background: rgba(99, 102, 241, 0.1); color: white; }
-        .nav-item.special { border: 1px solid var(--accent); color: var(--accent); margin-top: 10px; }
-
-        main { flex: 1; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle at top, #111827, #05070a); }
-        
+        nav { width: 260px; background: #0f172a; border-right: 1px solid rgba(255,255,255,0.05); padding: 20px; display: flex; flex-direction: column; overflow-y: auto; }
+        .nav-item { padding: 12px; border-radius: 12px; cursor: pointer; margin-bottom: 5px; color: #94a3b8; font-weight: 600; transition: 0.2s; border: 1px solid transparent; }
+        .nav-item.active { background: rgba(99, 102, 241, 0.1); color: white; border-color: var(--accent); }
+        .nav-item.special { background: linear-gradient(90deg, #6366f1, #a855f7); color: white; margin-top: 10px; }
+        main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
         #dashboard-view { display: none; width: 90%; max-width: 500px; }
         .stat-box { background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; }
-
         .card-container { perspective: 1200px; width: 340px; height: 480px; }
         .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); transform-style: preserve-3d; cursor: pointer; }
         .card.is-flipped { transform: rotateY(180deg); }
-        .face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 40px; padding: 30px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; background: var(--card); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 40px; padding: 30px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; background: var(--card); border: 1px solid rgba(255,255,255,0.1); }
         .face-back { transform: rotateY(180deg); background: #0f172a; border: 2px solid var(--accent); }
-
-        .img-box { width: 100%; height: 220px; border-radius: 25px; overflow: hidden; margin-bottom: 25px; background: #1e293b; }
+        .img-box { width: 100%; height: 220px; border-radius: 25px; overflow: hidden; margin-bottom: 25px; background: #000; }
         img { width: 100%; height: 100%; object-fit: cover; }
-
-        .word { font-size: 34px; font-weight: 800; text-align: center; margin: 0; }
-        .sentence { font-size: 18px; color: #94a3b8; margin-top: 15px; text-align: center; font-style: italic; }
-
+        .word { font-size: 32px; font-weight: 800; text-align: center; }
+        .sentence { font-size: 17px; color: #94a3b8; margin-top: 15px; text-align: center; font-style: italic; }
         .controls { display: flex; gap: 15px; width: 340px; margin-top: 30px; }
-        .btn { flex: 1; padding: 20px; border: none; border-radius: 25px; font-weight: 800; cursor: pointer; transition: 0.2s; font-size: 1rem; }
+        .btn { flex: 1; padding: 20px; border: none; border-radius: 25px; font-weight: 800; cursor: pointer; transition: 0.2s; }
         .btn-skip { background: #1e293b; color: #94a3b8; }
-        .btn-next { background: var(--accent); color: white; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3); }
-
-        #start-screen { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        .start-btn { background: var(--accent); padding: 25px 60px; border-radius: 50px; font-size: 1.8rem; font-weight: 800; color: white; border: none; cursor: pointer; }
+        .btn-next { background: var(--accent); color: white; }
+        #overlay { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-    <div id="start-screen">
-        <h1 style="font-size: 3rem; margin-bottom: 10px;">Refold Mastery</h1>
-        <p style="color: #64748b; margin-bottom: 40px;">Repaso de Fin de Semana Activado ⚡</p>
-        <button class="start-btn" onclick="startApp()">¡EMPEZAR REPASO! ⚡</button>
+    <div id="overlay">
+        <h1 style="font-size: 2.5rem; margin-bottom: 30px;">Refold Mastery</h1>
+        <button style="background:var(--accent); color:white; padding:20px 50px; border-radius:50px; border:none; font-weight:800; cursor:pointer;" onclick="startApp()">INICIAR REPASO</button>
     </div>
 
-    <nav>
-        <div style="font-weight: 800; color: var(--accent); margin-bottom: 30px; font-size: 1.4rem;">REFOLD PRO</div>
+    <nav id="sidebar">
+        <div style="font-weight: 800; color: var(--accent); margin-bottom: 20px;">MENU</div>
         <div class="nav-item active" onclick="changeView('study')">📖 Estudiar</div>
         <div class="nav-item" onclick="changeView('stats')">📊 Progreso</div>
-        <div style="margin: 20px 0; height: 1px; background: rgba(255,255,255,0.05);"></div>
+        <div style="height: 1px; background: rgba(255,255,255,0.05); margin: 15px 0;"></div>
         <div id="deck-list"></div>
     </nav>
 
     <main>
         <div id="study-view" style="display: flex; flex-direction: column; align-items: center;">
-            <div id="streak-label" style="color: #fbbf24; font-weight: 800; margin-bottom: 20px; font-size: 1.2rem;">🔥 Racha: 0 días</div>
+            <div id="streak-label" style="color: #fbbf24; font-weight: 800; margin-bottom: 10px;">🔥 Racha: 0 días</div>
+            <div id="counter-label" style="font-size: 0.8rem; color: #475569; margin-bottom: 10px;">Tarjeta 1 de 125</div>
             <div class="card-container">
                 <div class="card" id="card" onclick="this.classList.toggle('is-flipped')">
                     <div class="face">
@@ -68,80 +59,78 @@
                         <div class="sentence" id="q-sent">...</div>
                     </div>
                     <div class="face face-back">
-                        <div style="font-size: 0.8rem; letter-spacing: 3px; color: var(--accent); margin-bottom: 15px; font-weight: 800;">TRADUCCIÓN</div>
+                        <div style="font-size: 0.7rem; color: var(--accent); margin-bottom: 15px;">TRADUCCIÓN</div>
                         <div class="word" id="a-word" style="color: var(--success);">...</div>
-                        <div class="sentence" id="a-sent" style="color: white; font-style: normal;">...</div>
+                        <div class="sentence" id="a-sent" style="color: white;">...</div>
                     </div>
                 </div>
             </div>
             <div class="controls">
                 <button class="btn btn-skip" onclick="answer(false)">REPETIR</button>
-                <button class="btn btn-next" onclick="answer(true)">¡LO TENGO!</button>
+                <button class="btn btn-next" onclick="answer(true)">LO TENGO</button>
             </div>
         </div>
 
         <div id="dashboard-view">
-            <div class="stat-box">
-                <canvas id="myChart"></canvas>
-            </div>
+            <div class="stat-box"><canvas id="myChart"></canvas></div>
             <div class="stat-box" style="text-align: center;">
-                <h2 id="total-learned" style="margin: 0; color: var(--success); font-size: 3rem;">0</h2>
-                <p style="margin: 5px 0 0 0; color: #94a3b8;">Tarjetas hoy</p>
+                <h2 id="total-learned" style="margin: 0; color: var(--success); font-size: 2.5rem;">0</h2>
+                <p style="color: #94a3b8; margin: 5px 0 0 0;">Tarjetas completadas hoy</p>
             </div>
         </div>
     </main>
 
     <script>
+        // MAZOS UNIFICADOS
         const allDecks = {
             1: [
-                { w: "Actually", t: "En realidad", s: "Actually, it's very easy.", st: "En realidad, es muy fácil.", i: "https://images.unsplash.com/photo-1516321497487-e288fb19713f?w=400" },
-                { w: "Development", t: "Desarrollo", s: "Focus on development.", st: "Enfócate en el desarrollo.", i: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400" },
-                { w: "Available", t: "Disponible", s: "Is this seat available?", st: "¿Está este asiento disponible?", i: "https://images.unsplash.com/photo-1521791136064-7986c2959d99?w=400" }
+                { w: "Actually", t: "En realidad", s: "Actually, it is true.", st: "En realidad, es verdad.", i: "https://picsum.photos/seed/act/400/300" },
+                { w: "Development", t: "Desarrollo", s: "Focus on development.", st: "Enfócate en el desarrollo.", i: "https://picsum.photos/seed/dev/400/300" },
+                { w: "Available", t: "Disponible", s: "Is it available?", st: "¿Está disponible?", i: "https://picsum.photos/seed/ava/400/300" }
             ],
-            "sabado": [], // Se llena con las 125 tarjetas
-            "domingo": [] 
+            "repaso_sabado": [
+                { w: "Weekend", t: "Fin de semana", s: "Enjoy your weekend.", st: "Disfruta tu fin de semana.", i: "https://picsum.photos/seed/week/400/300" }
+            ]
         };
 
-        // Simulación de 1000 palabras (relleno rápido para ejemplo)
-        for(let i=2; i<=10; i++) allDecks[i] = [...allDecks[1]]; 
+        // Generar mazos vacíos para el menú
+        for(let i=2; i<=10; i++) if(!allDecks[i]) allDecks[i] = [...allDecks[1]];
 
-        let db = JSON.parse(localStorage.getItem('refold_v11_db')) || {
-            currentDeck: 1, index: 0, streak: 0, lastDate: "", history: [0, 0, 0, 0, 0, 0, 0]
+        let db = JSON.parse(localStorage.getItem('refold_v12_db')) || {
+            currentDeck: "repaso_sabado", index: 0, streak: 0, lastDate: "", history: [0, 0, 0, 0, 0, 0, 0]
         };
 
         let chart;
         const synth = window.speechSynthesis;
 
         function startApp() {
-            document.getElementById('start-screen').style.display = 'none';
-            updateStreak();
+            document.getElementById('overlay').style.display = 'none';
             updateMenu();
             render();
             initChart();
+            updateStreak();
         }
 
         function updateMenu() {
-            const container = document.getElementById('deck-list');
-            container.innerHTML = '';
-            const day = new Date().getDay(); // 6 es Sábado, 0 es Domingo
-
-            // Mazos normales 1-10
-            for(let i=1; i<=10; i++) {
-                const item = document.createElement('div');
-                item.className = `nav-item ${db.currentDeck === i ? 'active' : ''}`;
-                item.innerHTML = `📦 Mazo ${i}`;
-                item.onclick = () => { db.currentDeck = i; db.index = 0; render(); changeView('study'); };
-                container.appendChild(item);
+            const list = document.getElementById('deck-list');
+            list.innerHTML = '';
+            
+            // Botón Especial Sábado/Domingo (Prioritario)
+            const day = new Date().getDay();
+            if(day === 6 || day === 0) {
+                const spec = document.createElement('div');
+                spec.className = `nav-item special ${db.currentDeck.includes('repaso') ? 'active' : ''}`;
+                spec.innerHTML = `⭐ REPASO ${day === 6 ? 'SÁBADO' : 'DOMINGO'}`;
+                spec.onclick = () => { db.currentDeck = day === 6 ? "repaso_sabado" : "repaso_domingo"; db.index = 0; render(); changeView('study'); };
+                list.appendChild(spec);
             }
 
-            // Botón especial Fin de Semana
-            if(day === 6 || day === 0) {
-                const special = document.createElement('div');
-                const label = day === 6 ? "Sábado" : "Domingo";
-                special.className = `nav-item special ${db.currentDeck === label.toLowerCase() ? 'active' : ''}`;
-                special.innerHTML = `⭐ Repaso ${label}`;
-                special.onclick = () => { db.currentDeck = label.toLowerCase(); db.index = 0; render(); changeView('study'); };
-                container.appendChild(special);
+            for(let i=1; i<=10; i++) {
+                const item = document.createElement('div');
+                item.className = `nav-item ${db.currentDeck == i ? 'active' : ''}`;
+                item.innerHTML = `Mazo ${i}`;
+                item.onclick = () => { db.currentDeck = i; db.index = 0; render(); changeView('study'); };
+                list.appendChild(item);
             }
         }
 
@@ -155,31 +144,26 @@
             document.getElementById('a-sent').innerText = item.st;
             document.getElementById('q-img').src = item.i;
             document.getElementById('card').classList.remove('is-flipped');
+            document.getElementById('counter-label').innerText = `Tarjeta ${db.index + 1} de 125`;
             
-            // EL FIX DEL AUDIO: Forzar la lectura en cada renderizado
-            setTimeout(() => speak(item.w, item.s), 600);
+            speak(`${item.w}. ${item.s}`);
         }
 
-        function speak(w, s) {
-            synth.cancel(); // Detener cualquier audio previo
-            const utter = new SpeechSynthesisUtterance(`${w}. ${s}`);
-            utter.lang = 'en-US';
-            utter.rate = 0.8;
-            
-            // Seleccionar voz clara
-            const voices = synth.getVoices();
-            utter.voice = voices.find(v => v.lang.includes("en-US")) || voices[0];
-            
-            synth.speak(utter);
+        function speak(text) {
+            synth.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = 'en-US';
+            u.rate = 0.8;
+            synth.speak(u);
         }
 
         function answer(correct) {
             if(correct) {
                 db.index++;
                 const dayIdx = (new Date().getDay() + 6) % 7;
-                db.history[dayIdx]++;
+                db.history[dayIdx]++; // Solo suma si es correcto
+                save();
             }
-            save();
             render();
             if(chart) updateChart();
         }
@@ -194,12 +178,13 @@
             document.getElementById('streak-label').innerText = `🔥 Racha: ${db.streak} días`;
         }
 
-        function changeView(view) {
-            document.getElementById('study-view').style.display = view === 'study' ? 'flex' : 'none';
-            document.getElementById('dashboard-view').style.display = view === 'stats' ? 'block' : 'none';
+        function changeView(v) {
+            document.getElementById('study-view').style.display = v === 'study' ? 'flex' : 'none';
+            document.getElementById('dashboard-view').style.display = v === 'stats' ? 'block' : 'none';
+            updateMenu();
         }
 
-        function save() { localStorage.setItem('refold_v11_db', JSON.stringify(db)); }
+        function save() { localStorage.setItem('refold_v12_db', JSON.stringify(db)); }
 
         function initChart() {
             const ctx = document.getElementById('myChart').getContext('2d');
@@ -207,9 +192,9 @@
                 type: 'bar',
                 data: {
                     labels: ['L', 'M', 'X', 'J', 'V', 'S', 'D'],
-                    datasets: [{ label: 'Tarjetas', data: db.history, backgroundColor: '#6366f1', borderRadius: 8 }]
+                    datasets: [{ label: 'Tarjetas', data: db.history, backgroundColor: '#6366f1' }]
                 },
-                options: { responsive: true, scales: { y: { beginAtZero: true } } }
+                options: { responsive: true }
             });
             updateChart();
         }
@@ -219,9 +204,6 @@
             chart.update();
             document.getElementById('total-learned').innerText = db.history[(new Date().getDay() + 6) % 7];
         }
-
-        // Cargar voces al inicio para Windows
-        window.speechSynthesis.onvoiceschanged = () => synth.getVoices();
     </script>
 </body>
 </html>
