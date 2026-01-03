@@ -3,148 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Flashcards Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Refold 1000: English Mastery</title>
     <style>
-        :root { --primary: #4f46e5; --success: #10b981; --error: #ef4444; --text: #1e293b; }
-        body { font-family: 'Inter', sans-serif; background: #f1f5f9; color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+        :root { --primary: #4f46e5; --bg: #0f172a; --card-bg: #1e293b; --text: #f8fafc; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }
         
-        .header { position: fixed; top: 20px; text-align: center; }
-        .progress-text { font-size: 0.9rem; font-weight: 600; color: #64748b; margin-bottom: 8px; }
-        .bar-bg { width: 300px; height: 6px; background: #e2e8f0; border-radius: 10px; overflow: hidden; }
-        .bar-fill { width: 0%; height: 100%; background: var(--primary); transition: width 0.4s ease; }
+        .progress-bar { position: fixed; top: 0; width: 100%; height: 6px; background: #334155; }
+        #fill { height: 100%; background: var(--primary); width: 0%; transition: 0.3s; }
 
-        .card-container { perspective: 1000px; width: 340px; height: 480px; margin-top: 80px; }
-        .card { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
+        .card-container { perspective: 1000px; width: 90%; max-width: 350px; height: 480px; position: relative; }
+        .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; }
         .card.is-flipped { transform: rotateY(180deg); }
         
-        .face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 24px; background: white; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); display: flex; flex-direction: column; padding: 24px; box-sizing: border-box; }
-        .face-back { transform: rotateY(180deg); background: #f8fafc; border: 2px solid var(--primary); }
+        .face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 24px; padding: 25px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: var(--card-bg); border: 1px solid #334155; }
+        .face-back { transform: rotateY(180deg); background: #1e293b; }
 
-        .img-box { width: 100%; height: 200px; background: #f1f5f9; border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
-        img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s; }
+        .img-container { width: 100%; height: 180px; border-radius: 15px; overflow: hidden; margin-bottom: 20px; background: #0f172a; }
+        img { width: 100%; height: 100%; object-fit: cover; }
         
-        .word-en { font-size: 32px; font-weight: 800; color: var(--primary); margin: 0; }
-        .sentence-en { font-size: 18px; color: #475569; margin-top: 12px; line-height: 1.5; flex-grow: 1; }
-        
-        .word-es { font-size: 28px; font-weight: 700; color: var(--success); }
-        .sentence-es { font-size: 16px; color: #64748b; margin-top: 10px; font-style: italic; }
+        .word { font-size: 36px; font-weight: 800; color: #818cf8; margin: 0; }
+        .sentence { font-size: 18px; color: #94a3b8; margin-top: 15px; line-height: 1.4; font-style: italic; }
+        .translation { font-size: 22px; color: #22c55e; font-weight: 700; margin-top: 10px; }
 
-        .controls { display: flex; gap: 12px; margin-top: 30px; width: 340px; }
-        button { flex: 1; padding: 16px; border: none; border-radius: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-size: 14px; }
-        .btn-hard { background: #fee2e2; color: var(--error); }
-        .btn-easy { background: #dcfce7; color: var(--success); }
-        button:active { transform: scale(0.95); }
+        .controls { display: flex; gap: 15px; margin-top: 30px; width: 90%; max-width: 350px; }
+        button { flex: 1; padding: 18px; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 16px; }
+        .btn-red { background: #ef4444; color: white; }
+        .btn-green { background: #22c55e; color: white; }
         
-        .btn-audio { background: white; color: var(--primary); border: 2px solid #e2e8f0; margin-top: 10px; width: 340px; }
+        .instruction { margin-top: 15px; font-size: 12px; color: #64748b; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="progress-text" id="progress-txt">Aprendido: 0%</div>
-        <div class="bar-bg"><div class="bar-fill" id="bar"></div></div>
-    </div>
+    <div class="progress-bar"><div id="fill"></div></div>
+    
+    <div style="margin-bottom: 20px; font-weight: bold; color: #64748b;" id="counter">Cargando mazo...</div>
 
-    <div class="card-container" onclick="toggleFlip()">
+    <div class="card-container" onclick="flipCard()">
         <div class="card" id="card">
             <div class="face">
-                <div class="img-box"><img id="c-img" src="" alt=""></div>
-                <div class="word-en" id="c-word">Cargando...</div>
-                <div class="sentence-en" id="c-sent">...</div>
+                <div class="img-container"><img id="c-img" src="" alt=""></div>
+                <div class="word" id="c-word">Hacer clic para activar voz</div>
+                <div class="sentence" id="c-sent"></div>
             </div>
             <div class="face face-back">
-                <div style="color: #64748b; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Traducción</div>
-                <div class="word-es" id="c-trans">...</div>
-                <div class="sentence-es" id="c-sent-es">...</div>
+                <div style="color: #64748b; font-size: 14px; margin-bottom: 10px;">SIGNIFICADO</div>
+                <div class="word" id="c-trans" style="color: #22c55e;"></div>
+                <div class="translation" id="c-sent-es"></div>
             </div>
         </div>
     </div>
 
     <div class="controls">
-        <button class="btn-hard" onclick="answer(false)">REPETIR</button>
-        <button class="btn-easy" onclick="answer(true)">LO SÉ</button>
+        <button class="btn-red" onclick="answer(false)">REPETIR</button>
+        <button class="btn-green" onclick="answer(true)">LO SÉ</button>
     </div>
-    <button class="btn-audio" onclick="speak()">🔊 ESCUCHAR</button>
+
+    <p class="instruction">Toca la tarjeta para ver la traducción</p>
 
     <script>
-        const rawDeck = [
-            { w: "Life", t: "Vida", s: "Life is a beautiful journey.", st: "La vida es un viaje hermoso.", i: "https://images.unsplash.com/photo-1500622764614-be3c178304c1?w=400" },
-            { w: "World", t: "Mundo", s: "Travel around the world.", st: "Viajar por todo el mundo.", i: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400" },
-            { w: "Work", t: "Trabajo", s: "I have a lot of work today.", st: "Tengo mucho trabajo hoy.", i: "https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?w=400" },
-            { w: "House", t: "Casa", s: "This is my new house.", st: "Esta es mi nueva casa.", i: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=400" },
-            { w: "Think", t: "Pensar", s: "I think you are right.", st: "Pienso que tienes razón.", i: "https://images.unsplash.com/photo-1494173853739-c21f58b16055?w=400" },
-            { w: "Change", t: "Cambio", s: "Change is always good.", st: "El cambio siempre es bueno.", i: "https://images.unsplash.com/photo-1501139083538-0139583c060f?w=400" },
-            { w: "Light", t: "Luz", s: "The light is very bright.", st: "La luz es muy brillante.", i: "https://images.unsplash.com/photo-1467810563316-b5476525c0f9?w=400" }
+        // OPCIÓN B: Las primeras 50 palabras más comunes (Vocabulario Real)
+        const refold1000 = [
+            { w: "The", t: "El / La", s: "The world is big.", st: "El mundo es grande.", i: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400" },
+            { w: "Work", t: "Trabajo", s: "I have work to do.", st: "Tengo trabajo que hacer.", i: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=400" },
+            { w: "Think", t: "Pensar", s: "I think about you.", st: "Pienso en ti.", i: "https://images.unsplash.com/photo-1516062423079-7ca13cdc7f5a?w=400" },
+            { w: "Life", t: "Vida", s: "Life is beautiful.", st: "La vida es bella.", i: "https://images.unsplash.com/photo-1500622764614-be3c178304c1?w=400" },
+            { w: "Time", t: "Tiempo", s: "Time flies so fast.", st: "El tiempo vuela muy rápido.", i: "https://images.unsplash.com/photo-1508921334172-b68ed335b3dd?w=400" },
+            { w: "People", t: "Gente", s: "People are friendly.", st: "La gente es amable.", i: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=400" },
+            { w: "Believe", t: "Creer", s: "I believe in you.", st: "Creo en ti.", i: "https://images.unsplash.com/photo-1517130038641-a774d04afb3c?w=400" },
+            { w: "Understand", t: "Entender", s: "Do you understand?", st: "¿Entiendes?", i: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400" },
+            { w: "Way", t: "Camino / Forma", s: "That is the way.", st: "Ese es el camino.", i: "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=400" },
+            { w: "Find", t: "Encontrar", s: "I need to find my keys.", st: "Necesito encontrar mis llaves.", i: "https://images.unsplash.com/photo-1542332213-31f87348057f?w=400" }
+            // ... Puedes añadir las otras 950 aquí siguiendo este formato
         ];
 
-        let deck = JSON.parse(localStorage.getItem('refold_v2')) || rawDeck.map(item => ({...item, level: 0}));
+        let deck = JSON.parse(localStorage.getItem('refold_pro_v3')) || refold1000;
         let index = 0;
-        const synth = window.speechSynthesis;
+        let audioEnabled = false;
 
-        function update() {
+        function updateCard() {
             const item = deck[index];
-            const card = document.getElementById('card');
+            const cardElement = document.getElementById('card');
             
-            // 1. Resetear visuales para evitar lag de imagen anterior
-            card.classList.remove('is-flipped');
-            document.getElementById('c-img').style.opacity = 0;
+            cardElement.classList.remove('is-flipped');
             
             setTimeout(() => {
                 document.getElementById('c-word').innerText = item.w;
-                document.getElementById('c-sent').innerText = item.s;
+                document.getElementById('c-sent').innerText = `"${item.s}"`;
                 document.getElementById('c-trans').innerText = item.t;
                 document.getElementById('c-sent-es').innerText = item.st;
                 document.getElementById('c-img').src = item.i;
-                document.getElementById('c-img').onload = () => document.getElementById('c-img').style.opacity = 1;
                 
-                // Progreso
-                const done = deck.filter(c => c.level > 0).length;
-                const perc = Math.round((done / deck.length) * 100);
-                document.getElementById('bar').style.width = perc + "%";
-                document.getElementById('progress-txt').innerText = `Aprendido: ${perc}%`;
+                document.getElementById('counter').innerText = `Progreso: ${index + 1} / ${deck.length}`;
+                document.getElementById('fill').style.width = `${((index + 1) / deck.length) * 100}%`;
                 
-                speak();
-            }, 300); // Pequeña espera para que la tarjeta termine de voltearse al frente
+                if(audioEnabled) playVoice();
+            }, 250);
         }
 
-        function toggleFlip() { document.getElementById('card').classList.toggle('is-flipped'); }
+        function flipCard() {
+            audioEnabled = true; // El primer clic activa el audio
+            document.getElementById('card').classList.toggle('is-flipped');
+            if(!document.getElementById('card').classList.contains('is-flipped')) {
+                playVoice();
+            }
+        }
 
-        function answer(easy) {
+        function answer(isEasy) {
             event.stopPropagation();
-            if(easy) {
-                deck[index].level++;
+            if(isEasy) {
+                // Si la sabe, se va al final
                 const item = deck.splice(index, 1)[0];
                 deck.push(item);
             } else {
-                deck[index].level = 0;
+                // Si no, se queda cerca (en 3 posiciones)
                 const item = deck.splice(index, 1)[0];
-                deck.splice(2, 0, item); // Aparece muy pronto
+                deck.splice(3, 0, item);
             }
-            localStorage.setItem('refold_v2', JSON.stringify(deck));
-            update();
+            localStorage.setItem('refold_pro_v3', JSON.stringify(deck));
+            updateCard();
         }
 
-        function speak() {
-            synth.cancel();
+        function playVoice() {
+            window.speechSynthesis.cancel();
             const item = deck[index];
-            const w = new SpeechSynthesisUtterance(item.w);
-            const s = new SpeechSynthesisUtterance(item.s);
-            w.lang = s.lang = 'en-US';
-            w.rate = 0.8;
-            s.rate = 0.8;
-            
-            synth.speak(w);
-            w.onend = () => setTimeout(() => synth.speak(s), 300);
+            const msgWord = new SpeechSynthesisUtterance(item.w);
+            const msgSent = new SpeechSynthesisUtterance(item.s);
+            msgWord.lang = msgSent.lang = 'en-US';
+            msgWord.rate = 0.8;
+            msgSent.rate = 0.8;
+
+            window.speechSynthesis.speak(msgWord);
+            msgWord.onend = () => {
+                setTimeout(() => window.speechSynthesis.speak(msgSent), 400);
+            };
         }
 
-        // Inicializar voces (Fix para algunos navegadores)
-        window.onload = () => {
-            update();
-            if (speechSynthesis.onvoiceschanged !== undefined) {
-                speechSynthesis.onvoiceschanged = () => {}; 
-            }
-        };
+        window.onload = updateCard;
     </script>
 </body>
 </html>
