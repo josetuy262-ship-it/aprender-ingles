@@ -403,8 +403,11 @@
             aprendidas.push(id);
             localStorage.setItem('refold_aprendidas', JSON.stringify(aprendidas));
         }
-    }
-
+    };
+let currentDeck = 1;
+let currentIndex = 0;
+let wordsPerDeck = 5;
+let wordsToday = [];
     // 3. INICIO MEJORADO
     function iniciar() {
         const select = document.getElementById('words-per-day');
@@ -520,6 +523,7 @@ function responder(entendido) {
 </script>
 </body>
 </html>
+
 
 
 
