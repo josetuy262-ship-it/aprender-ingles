@@ -392,25 +392,6 @@
             { id: "m3-100", w: "Damage", t: "Daño/Dañar", s: "Serious damage.", st: "Daño serio.", i: "https://picsum.photos/seed/m3p100/400/300" }
         ], 
             };
-    // Llenado automático de 1000 palabras
-    for (let m = 1; m <= 10; m++) {
-        for (let i = 0; i < 100; i++) {
-            data[m].push({
-                id: `m${m}-${i}`, // ID único para rastrear la palabra
-                w: `Word ${i + 1} (Mazo ${m})`,
-                t: `Palabra ${i + 1}`,
-                s: `Example sentence for word ${i + 1}.`,
-                st: `Oración de ejemplo para la palabra ${i + 1}.`,
-                i: `https://picsum.photos/seed/m${m}img${i}/400/300`
-            });
-        }
-    }
-
-    let currentDeck = 1;
-    let currentIndex = 0;
-    let wordsPerDeck = 5;
-    let wordsToday = []; // Las palabras que toca estudiar hoy
-
     // 2. LÓGICA DE MEMORIA (LocalStorage)
     function getAprendidas() {
         return JSON.parse(localStorage.getItem('refold_aprendidas')) || [];
@@ -542,6 +523,7 @@ function responder(entendido) {
 </script>
 </body>
 </html>
+
 
 
 
