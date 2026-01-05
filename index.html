@@ -418,9 +418,6 @@
             prepararRepasoFinDeSemana(aprendidas);
         } else {
             // Filtrar: Tomar las primeras N palabras que NO estén en 'aprendidas'
-            for (let m = 1; m <= 10; m++) {
-                data[m] = data[m].filter(word => !aprendidas.includes(word.id)).slice(0, wordsPerDeck);
-            }
         }
 
         document.getElementById('overlay').style.display = 'none';
@@ -523,6 +520,7 @@ function responder(entendido) {
 </script>
 </body>
 </html>
+
 
 
 
