@@ -258,47 +258,64 @@
         currentDeck = "repaso";
     }
 
-    function cargarTarjeta() {
-        const deck = data[currentDeck];
-        if (!deck || deck.length === 0) {
-            document.getElementById('card').innerHTML = "<h2 style='padding:20px'>¡Mazo completado!<br>Vuelve mañana para nuevas palabras.</h2>";
-            return;
-        }
+    // 1. Añadimos una variable para la "nube temporal" de la sesión
+let conteoSesion = {}; 
 
-        const item = deck[currentIndex];
-        document.getElementById('card').classList.remove('is-flipped');
-        document.getElementById('q-img').src = item.i;
-        document.getElementById('q-word').innerText = item.w;
-        document.getElementById('q-sent').innerText = item.s;
-        document.getElementById('a-word').innerText = item.t;
-        document.getElementById('a-sent').innerText = item.st;
-        
-        const totalAprendidas = getAprendidas().length;
-        document.getElementById('progress-tag').innerText = `Mazo ${currentDeck} | ${currentIndex + 1}/${deck.length} (Total: ${totalAprendidas}/1000)`;
+function cargarTarjeta() {
+    const deck = data[currentDeck];
+    if (!deck || deck.length === 0) {
+        document.getElementById('card').innerHTML = "<h2 style='padding:20px'>¡Mazo completado!<br>Vuelve mañana.</h2>";
+        return;
     }
 
-    function responder(entendido) {
-        const deck = data[currentDeck];
-        const item = deck[currentIndex];
+    // Si la carta no tiene conteo en esta sesión, empezamos en 0
+    const item = deck[currentIndex];
+    if (!conteoSesion[item.id]) conteoSesion[item.id] = 0;
 
-        if (entendido) {
-            // Si es un día normal, guardamos que ya se la sabe
+    document.getElementById('card').classList.remove('is-flipped');
+    document.getElementById('q-img').src = item.i;
+    document.getElementById('q-word').innerText = item.w;
+    document.getElementById('q-sent').innerText = item.s;
+    document.getElementById('a-word').innerText = item.t;
+    document.getElementById('a-sent').innerText = item.st;
+    
+    // Mostramos cuántas veces llevas confirmada esta palabra (0 de 3, 1 de 3, etc.)
+    const totalAprendidas = getAprendidas().length;
+    document.getElementById('progress-tag').innerText = 
+        `Mazo ${currentDeck} | Repasos: ${conteoSesion[item.id]}/3 | Total: ${totalAprendidas}/1000`;
+}
+
+function responder(entendido) {
+    const deck = data[currentDeck];
+    const item = deck[currentIndex];
+
+    if (entendido) {
+        // Aumentamos el contador de la "nube temporal"
+        conteoSesion[item.id]++;
+
+        if (conteoSesion[item.id] >= 3) {
+            // ¡SOLO AQUÍ SE GUARDA COMO APRENDIDA DE VERDAD!
             if (currentDeck !== "repaso") {
                 guardarProgreso(item.id);
             }
-            deck.splice(currentIndex, 1); // La quitamos de la sesión de hoy
+            deck.splice(currentIndex, 1); 
         } else {
-            // Si falla, la mueve al final para repetir ahora mismo
-            const failItem = deck.splice(currentIndex, 1)[0];
-            deck.push(failItem);
+            // Si aún no llega a 3, la mandamos al final para que vuelva a salir
+            const temp = deck.splice(currentIndex, 1)[0];
+            deck.push(temp);
         }
+    } else {
+        // Si falla, reseteamos su contador a 0 y al final
+        conteoSesion[item.id] = 0;
+        const failItem = deck.splice(currentIndex, 1)[0];
+        deck.push(failItem);
+    }
 
-        // Si el mazo se vacía, terminó
-        if (deck.length === 0) {
-            alert("¡Buen trabajo! Has terminado este mazo por hoy.");
-        }
-        
-        cargarTarjeta();
+    if (deck.length === 0) {
+        alert("¡Sesión finalizada! Has confirmado todas las palabras 3 veces.");
+    }
+    
+    cargarTarjeta();
     }
 
     function crearMenu(esFinde) {
