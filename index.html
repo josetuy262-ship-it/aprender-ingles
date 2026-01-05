@@ -85,59 +85,158 @@
     </main>
 
 <script>
-    // 1. BASE DE DATOS INICIAL
-    const data = {
-        "repaso": [],
-        1: [
-            { w: "Actually", t: "En realidad", s: "Actually, it's very easy.", st: "En realidad, es muy fácil.", i: "https://picsum.photos/seed/1/400/300" },
-            { w: "Development", t: "Desarrollo", s: "Focus on development.", st: "Enfócate en el desarrollo.", i: "https://picsum.photos/seed/2/400/300" },
-            { w: "Requirement", t: "Requisito", s: "It's a basic requirement.", st: "Es un requisito básico.", i: "https://picsum.photos/seed/3/400/300" },
-            { w: "Knowledge", t: "Conocimiento", s: "Knowledge is power.", st: "El conocimiento es poder.", i: "https://picsum.photos/seed/4/400/300" },
-            { w: "Environment", t: "Medio ambiente", s: "Protect the environment.", st: "Protege el medio ambiente.", i: "https://picsum.photos/seed/5/400/300" },
-            { w: "Improvement", t: "Mejora", s: "I see a big improvement.", st: "Veo una gran mejora.", i: "https://picsum.photos/seed/6/400/300" },
-            { w: "Available", t: "Disponible", s: "Is this seat available?", st: "¿Está este asiento disponible?", i: "https://picsum.photos/seed/7/400/300" },
-            { w: "Challenge", t: "Desafío", s: "Accept the challenge.", st: "Acepta el desafío.", i: "https://picsum.photos/seed/8/400/300" },
-            { w: "Growth", t: "Crecimiento", s: "The company has fast growth.", st: "La empresa tiene un crecimiento rápido.", i: "https://picsum.photos/seed/9/400/300" },
-            { w: "Income", t: "Ingresos", s: "His income is very high.", st: "Sus ingresos son muy altos.", i: "https://picsum.photos/seed/10/400/300" }
+    // 1. BASE DE DATOS (Se mantiene igual tu lógica de carga)
+    const data = { "repaso": [], 1: [
+            { id: "m1-1", w: "Actually", t: "En realidad", s: "Actually, it's very easy.", st: "En realidad, es muy fácil.", i: "https://picsum.photos/seed/m1p1/400/300" },
+            { id: "m1-2", w: "Available", t: "Disponible", s: "Is it available?", st: "¿Está disponible?", i: "https://picsum.photos/seed/m1p2/400/300" },
+            { id: "m1-3", w: "Development", t: "Desarrollo", s: "Personal development.", st: "Desarrollo personal.", i: "https://picsum.photos/seed/m1p3/400/300" },
+            { id: "m1-4", w: "Knowledge", t: "Conocimiento", s: "Knowledge is power.", st: "El conocimiento es poder.", i: "https://picsum.photos/seed/m1p4/400/300" },
+            { id: "m1-5", w: "Challenge", t: "Desafío", s: "Accept the challenge.", st: "Acepta el desafío.", i: "https://picsum.photos/seed/m1p5/400/300" },
+            { id: "m1-6", w: "Achievement", t: "Logro", s: "A great achievement.", st: "Un gran logro.", i: "https://picsum.photos/seed/m1p6/400/300" },
+            { id: "m1-7", w: "Avoid", t: "Evitar", s: "Try to avoid mistakes.", st: "Intenta evitar errores.", i: "https://picsum.photos/seed/m1p7/400/300" },
+            { id: "m1-8", w: "Behavior", t: "Comportamiento", s: "Good behavior.", st: "Buen comportamiento.", i: "https://picsum.photos/seed/m1p8/400/300" },
+            { id: "m1-9", w: "Benefit", t: "Beneficio", s: "This has many benefits.", st: "Esto tiene muchos beneficios.", i: "https://picsum.photos/seed/m1p9/400/300" },
+            { id: "m1-10", w: "Concern", t: "Preocupación", s: "It's a major concern.", st: "Es una gran preocupación.", i: "https://picsum.photos/seed/m1p10/400/300" },
+            { id: "m1-11", w: "Delivery", t: "Entrega", s: "Fast delivery.", st: "Entrega rápida.", i: "https://picsum.photos/seed/m1p11/400/300" },
+            { id: "m1-12", w: "Environment", t: "Medio ambiente", s: "Protect the environment.", st: "Protege el medio ambiente.", i: "https://picsum.photos/seed/m1p12/400/300" },
+            { id: "m1-13", w: "Feedback", t: "Retroalimentación", s: "Positive feedback.", st: "Comentarios positivos.", i: "https://picsum.photos/seed/m1p13/400/300" },
+            { id: "m1-14", w: "Goal", t: "Meta", s: "Reach your goals.", st: "Alcanza tus metas.", i: "https://picsum.photos/seed/m1p14/400/300" },
+            { id: "m1-15", w: "Healthy", t: "Saludable", s: "Healthy lifestyle.", st: "Estilo de vida saludable.", i: "https://picsum.photos/seed/m1p15/400/300" },
+            { id: "m1-16", w: "Improve", t: "Mejorar", s: "Improve your skills.", st: "Mejora tus habilidades.", i: "https://picsum.photos/seed/m1p16/400/300" },
+            { id: "m1-17", w: "Journey", t: "Viaje", s: "Safe journey!", st: "¡Buen viaje!", i: "https://picsum.photos/seed/m1p17/400/300" },
+            { id: "m1-18", w: "Likely", t: "Probable", s: "It's likely to happen.", st: "Es probable que pase.", i: "https://picsum.photos/seed/m1p18/400/300" },
+            { id: "m1-19", w: "Management", t: "Gestión", s: "Time management.", st: "Gestión del tiempo.", i: "https://picsum.photos/seed/m1p19/400/300" },
+            { id: "m1-20", w: "Notice", t: "Notar/Aviso", s: "I didn't notice it.", st: "No lo noté.", i: "https://picsum.photos/seed/m1p20/400/300" },
+            { id: "m1-21", w: "Opportunity", t: "Oportunidad", s: "A big opportunity.", st: "Una gran oportunidad.", i: "https://picsum.photos/seed/m1p21/400/300" },
+            { id: "m1-22", w: "Performance", t: "Rendimiento", s: "High performance.", st: "Alto rendimiento.", i: "https://picsum.photos/seed/m1p22/400/300" },
+            { id: "m1-23", w: "Quality", t: "Calidad", s: "High quality.", st: "Alta calidad.", i: "https://picsum.photos/seed/m1p23/400/300" },
+            { id: "m1-24", w: "Reason", t: "Razón", s: "Give me a reason.", st: "Dame una razón.", i: "https://picsum.photos/seed/m1p24/400/300" },
+            { id: "m1-25", w: "Successful", t: "Exitoso", s: "A successful man.", st: "Un hombre exitoso.", i: "https://picsum.photos/seed/m1p25/400/300" },
+            { id: "m1-26", w: "Task", t: "Tarea", s: "An easy task.", st: "Una tarea fácil.", i: "https://picsum.photos/seed/m1p26/400/300" },
+            { id: "m1-27", w: "Understand", t: "Entender", s: "Do you understand?", st: "¿Entiendes?", i: "https://picsum.photos/seed/m1p27/400/300" },
+            { id: "m1-28", w: "Value", t: "Valor", s: "Market value.", st: "Valor de mercado.", i: "https://picsum.photos/seed/m1p28/400/300" },
+            { id: "m1-29", w: "Wealth", t: "Riqueza", s: "Wealth and health.", st: "Riqueza y salud.", i: "https://picsum.photos/seed/m1p29/400/300" },
+            { id: "m1-30", w: "Yield", t: "Rendir/Producir", s: "High yield.", st: "Alto rendimiento.", i: "https://picsum.photos/seed/m1p30/400/300" },
+            { id: "m1-31", w: "Ability", t: "Habilidad", s: "Natural ability.", st: "Habilidad natural.", i: "https://picsum.photos/seed/m1p31/400/300" },
+            { id: "m1-32", w: "Brief", t: "Breve", s: "A brief meeting.", st: "Una reunión breve.", i: "https://picsum.photos/seed/m1p32/400/300" },
+            { id: "m1-33", w: "Certain", t: "Cierto/Seguro", s: "Are you certain?", st: "¿Estás seguro?", i: "https://picsum.photos/seed/m1p33/400/300" },
+            { id: "m1-34", w: "Degree", t: "Grado/Título", s: "College degree.", st: "Título universitario.", i: "https://picsum.photos/seed/m1p34/400/300" },
+            { id: "m1-35", w: "Effort", t: "Esfuerzo", s: "Great effort.", st: "Gran esfuerzo.", i: "https://picsum.photos/seed/m1p35/400/300" },
+            { id: "m1-36", w: "Feature", t: "Característica", s: "New features.", st: "Nuevas funciones.", i: "https://picsum.photos/seed/m1p36/400/300" },
+            { id: "m1-37", w: "Growth", t: "Crecimiento", s: "Economic growth.", st: "Crecimiento económico.", i: "https://picsum.photos/seed/m1p37/400/300" },
+            { id: "m1-38", w: "Hope", t: "Esperanza", s: "Don't lose hope.", st: "No pierdas la esperanza.", i: "https://picsum.photos/seed/m1p38/400/300" },
+            { id: "m1-39", w: "Issue", t: "Problema/Tema", s: "A serious issue.", st: "Un problema serio.", i: "https://picsum.photos/seed/m1p39/400/300" },
+            { id: "m1-40", w: "Job", t: "Trabajo", s: "Good job!", st: "¡Buen trabajo!", i: "https://picsum.photos/seed/m1p40/400/300" },
+            { id: "m1-41", w: "Kind", t: "Amable/Tipo", s: "She is very kind.", st: "Ella es muy amable.", i: "https://picsum.photos/seed/m1p41/400/300" },
+            { id: "m1-42", w: "Lack", t: "Falta de", s: "Lack of sleep.", st: "Falta de sueño.", i: "https://picsum.photos/seed/m1p42/400/300" },
+            { id: "m1-43", w: "Method", t: "Método", s: "Scientific method.", st: "Método científico.", i: "https://picsum.photos/seed/m1p43/400/300" },
+            { id: "m1-44", w: "Network", t: "Red", s: "Social network.", st: "Red social.", i: "https://picsum.photos/seed/m1p44/400/300" },
+            { id: "m1-45", w: "Owner", t: "Dueño", s: "Business owner.", st: "Dueño de negocio.", i: "https://picsum.photos/seed/m1p45/400/300" },
+            { id: "m1-46", w: "Partner", t: "Socio/Pareja", s: "Business partner.", st: "Socio de negocios.", i: "https://picsum.photos/seed/m1p46/400/300" },
+            { id: "m1-47", w: "Quarter", t: "Trimestre/Cuarto", s: "First quarter.", st: "Primer trimestre.", i: "https://picsum.photos/seed/m1p47/400/300" },
+            { id: "m1-48", w: "Range", t: "Rango/Variedad", s: "A wide range.", st: "Una amplia variedad.", i: "https://picsum.photos/seed/m1p48/400/300" },
+            { id: "m1-49", w: "Skill", t: "Habilidad", s: "New skills.", st: "Nuevas habilidades.", i: "https://picsum.photos/seed/m1p49/400/300" },
+            { id: "m1-50", w: "Trend", t: "Tendencia", s: "Market trends.", st: "Tendencias del mercado.", i: "https://picsum.photos/seed/m1p50/400/300" },
+            { id: "m1-51", w: "Useful", t: "Útil", s: "It's a useful tool.", st: "Es una herramienta útil.", i: "https://picsum.photos/seed/m1p51/400/300" },
+            { id: "m1-52", w: "View", t: "Vista/Ver", s: "A beautiful view.", st: "Una vista hermosa.", i: "https://picsum.photos/seed/m1p52/400/300" },
+            { id: "m1-53", w: "Warning", t: "Advertencia", s: "This is a warning.", st: "Esto es una advertencia.", i: "https://picsum.photos/seed/m1p53/400/300" },
+            { id: "m1-54", w: "X-ray", t: "Radiografía", s: "I need an X-ray.", st: "Necesito una radiografía.", i: "https://picsum.photos/seed/m1p54/400/300" },
+            { id: "m1-55", w: "Youth", t: "Juventud", s: "Enjoy your youth.", st: "Disfruta tu juventud.", i: "https://picsum.photos/seed/m1p55/400/300" },
+            { id: "m1-56", w: "Zone", t: "Zona", s: "Danger zone.", st: "Zona de peligro.", i: "https://picsum.photos/seed/m1p56/400/300" },
+            { id: "m1-57", w: "Account", t: "Cuenta", s: "Check my account.", st: "Revisa mi cuenta.", i: "https://picsum.photos/seed/m1p57/400/300" },
+            { id: "m1-58", w: "Balance", t: "Equilibrio", s: "Keep your balance.", st: "Mantén el equilibrio.", i: "https://picsum.photos/seed/m1p58/400/300" },
+            { id: "m1-59", w: "Capacity", t: "Capacidad", s: "Full capacity.", st: "Capacidad máxima.", i: "https://picsum.photos/seed/m1p59/400/300" },
+            { id: "m1-60", w: "Damage", t: "Daño", s: "Serious damage.", st: "Daño serio.", i: "https://picsum.photos/seed/m1p60/400/300" },
+            { id: "m1-61", w: "Education", t: "Educación", s: "Quality education.", st: "Educación de calidad.", i:"https://picsum.photos/seed/m1p61/400/300" },
+            { id: "m1-62", w: "Failure", t: "Fracaso", s: "Failure is a lesson.", st: "El fracaso es una lección.", i: "https://picsum.photos/seed/m1p62/400/300" },
+            { id: "m1-63", w: "General", t: "General", s: "General rule.", st: "Regla general.", i: "https://picsum.photos/seed/m1p63/400/300" },
+            { id: "m1-64", w: "History", t: "Historia", s: "I like history.", st: "Me gusta la historia.", i: "https://picsum.photos/seed/m1p64/400/300" },
+            { id: "m1-65", w: "Income", t: "Ingresos", s: "Annual income.", st: "Ingresos anuales.", i: "https://picsum.photos/seed/m1p65/400/300" },
+            { id: "m1-66", w: "Judge", t: "Juzgar/Juez", s: "Don't judge me.", st: "No me juzgues.", i: "https://picsum.photos/seed/m1p66/400/300" },
+            { id: "m1-67", w: "Key", t: "Clave/Llave", s: "The key to success.", st: "La clave del éxito.", i: "https://picsum.photos/seed/m1p67/400/300" },
+            { id: "m1-68", w: "Layer", t: "Capa", s: "A thin layer.", st: "Una capa fina.", i: "https://picsum.photos/seed/m1p68/400/300" },
+            { id: "m1-69", w: "Meeting", t: "Reunión", s: "Business meeting.", st: "Reunión de negocios.", i: "https://picsum.photos/seed/m1p69/400/300" },
+            { id: "m1-70", w: "Nature", t: "Naturaleza", s: "Human nature.", st: "Naturaleza humana.", i: "https://picsum.photos/seed/m1p70/400/300" },
+            { id: "m1-71", w: "Order", t: "Orden/Pedido", s: "Place an order.", st: "Hacer un pedido.", i: "https://picsum.photos/seed/m1p71/400/300" },
+            { id: "m1-72", w: "Power", t: "Poder/Energía", s: "Solar power.", st: "Energía solar.", i: "https://picsum.photos/seed/m1p72/400/300" },
+            { id: "m1-73", w: "Quickly", t: "Rápidamente", s: "Act quickly.", st: "Actúa rápido.", i: "https://picsum.photos/seed/m1p73/400/300" },
+            { id: "m1-74", w: "Rate", t: "Tasa/Ritmo", s: "Interest rate.", st: "Tasa de interés.", i: "https://picsum.photos/seed/m1p74/400/300" },
+            { id: "m1-75", w: "Safety", t: "Seguridad", s: "Safety first.", st: "La seguridad primero.", i: "https://picsum.photos/seed/m1p75/400/300" },
+            { id: "m1-76", w: "Theory", t: "Teoría", s: "In theory, yes.", st: "En teoría, sí.", i: "https://picsum.photos/seed/m1p76/400/300" },
+            { id: "m1-77", w: "Unit", t: "Unidad", s: "Family unit.", st: "Unidad familiar.", i: "https://picsum.photos/seed/m1p77/400/300" },
+            { id: "m1-78", w: "Version", t: "Versión", s: "New version.", st: "Nueva versión.", i: "https://picsum.photos/seed/m1p78/400/300" },
+            { id: "m1-79", w: "Weight", t: "Peso", s: "Lose weight.", st: "Perder peso.", i: "https://picsum.photos/seed/m1p79/400/300" },
+            { id: "m1-80", w: "Yard", t: "Patio", s: "In the backyard.", st: "En el patio trasero.", i: "https://picsum.photos/seed/m1p80/400/300" },
+            { id: "m1-81", w: "Advice", t: "Consejo", s: "Good advice.", st: "Buen consejo.", i: "https://picsum.photos/seed/m1p81/400/300" },
+            { id: "m1-82", w: "Break", t: "Romper/Descanso", s: "Take a break.", st: "Tómate un descanso.", i: "https://picsum.photos/seed/m1p82/400/300" },
+            { id: "m1-83", w: "Choice", t: "Elección", s: "It's your choice.", st: "Es tu elección.", i: "https://picsum.photos/seed/m1p83/400/300" },
+            { id: "m1-84", w: "Deal", t: "Trato", s: "We have a deal.", st: "Tenemos un trato.", i: "https://picsum.photos/seed/m1p84/400/300" },
+            { id: "m1-85", w: "Energy", t: "Energía", s: "Save energy.", st: "Ahorra energía.", i: "https://picsum.photos/seed/m1p85/400/300" },
+            { id: "m1-86", w: "Field", t: "Campo", s: "In this field.", st: "En este campo.", i: "https://picsum.photos/seed/m1p86/400/300" },
+            { id: "m1-87", w: "Guess", t: "Adivinar", s: "Take a guess.", st: "Adivina.", i: "https://picsum.photos/seed/m1p87/400/300" },
+            { id: "m1-88", w: "Height", t: "Altura", s: "Medium height.", st: "Estatura media.", i: "https://picsum.photos/seed/m1p88/400/300" },
+            { id: "m1-89", w: "Ideal", t: "Ideal", s: "The ideal place.", st: "El lugar ideal.", i: "https://picsum.photos/seed/m1p89/400/300" },
+            { id: "m1-90", w: "Join", t: "Unirse", s: "Join us!", st: "¡Únete!", i: "https://picsum.photos/seed/m1p90/400/300" },
+            { id: "m1-91", w: "Kitchen", t: "Cocina", s: "In the kitchen.", st: "En la cocina.", i: "https://picsum.photos/seed/m1p91/400/300" },
+            { id: "m1-92", w: "Leader", t: "Líder", s: "Natural leader.", st: "Líder natural.", i: "https://picsum.photos/seed/m1p92/400/300" },
+            { id: "m1-93", w: "Memory", t: "Memoria", s: "Childhood memory.", st: "Recuerdo de infancia.", i: "https://picsum.photos/seed/m1p93/400/300" },
+            { id: "m1-94", w: "News", t: "Noticias", s: "Good news.", st: "Buenas noticias.", i: "https://picsum.photos/seed/m1p94/400/300" },
+            { id: "m1-95", w: "Opinion", t: "Opinión", s: "In my opinion.", st: "En mi opinión.", i: "https://picsum.photos/seed/m1p95/400/300" },
+            { id: "m1-96", w: "Page", t: "Página", s: "Turn the page.", st: "Pasa la página.", i: "https://picsum.photos/seed/m1p96/400/300" },
+            { id: "m1-97", w: "Question", t: "Pregunta", s: "Any questions?", st: "¿Alguna pregunta?", i: "https://picsum.photos/seed/m1p97/400/300" },
+            { id: "m1-98", w: "Real", t: "Real", s: "A real story.", st: "Una historia real.", i: "https://picsum.photos/seed/m1p98/400/300" },
+            { id: "m1-99", w: "Scene", t: "Escena", s: "Crime scene.", st: "Escena del crimen.", i: "https://picsum.photos/seed/m1p99/400/300" },
+            { id: "m1-100", w: "Target", t: "Objetivo/Blanco", s: "Hit the target.", st: "Dale al blanco.", i: "https://picsum.photos/seed/m1p100/400/300" }
         ],
-        2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: []
-    };
+         2:[], 3:[], 4:[], 5:[], 6:[], 7:[], 8:[], 9:[], 10:[] };
 
-    // 2. LLENADO AUTOMÁTICO (Tu lógica de las 1000 palabras)
+    // Llenado automático de 1000 palabras
     for (let m = 1; m <= 10; m++) {
-        if (data[m].length < 100) {
-            let inicio = data[m].length;
-            for (let i = inicio; i < 100; i++) {
-                data[m].push({
-                    w: `Word ${i + 1} (Mazo ${m})`,
-                    t: `Palabra ${i + 1}`,
-                    s: `Example sentence for word ${i + 1}.`,
-                    st: `Oración de ejemplo para la palabra ${i + 1}.`,
-                    i: `https://picsum.photos/seed/m${m}img${i}/400/300`
-                });
-            }
+        for (let i = 0; i < 100; i++) {
+            data[m].push({
+                id: `m${m}-${i}`, // ID único para rastrear la palabra
+                w: `Word ${i + 1} (Mazo ${m})`,
+                t: `Palabra ${i + 1}`,
+                s: `Example sentence for word ${i + 1}.`,
+                st: `Oración de ejemplo para la palabra ${i + 1}.`,
+                i: `https://picsum.photos/seed/m${m}img${i}/400/300`
+            });
         }
     }
 
     let currentDeck = 1;
     let currentIndex = 0;
     let wordsPerDeck = 5;
+    let wordsToday = []; // Las palabras que toca estudiar hoy
 
-    // 3. FUNCIÓN DE INICIO CON FILTRO ANKI
+    // 2. LÓGICA DE MEMORIA (LocalStorage)
+    function getAprendidas() {
+        return JSON.parse(localStorage.getItem('refold_aprendidas')) || [];
+    }
+
+    function guardarProgreso(id) {
+        let aprendidas = getAprendidas();
+        if (!aprendidas.includes(id)) {
+            aprendidas.push(id);
+            localStorage.setItem('refold_aprendidas', JSON.stringify(aprendidas));
+        }
+    }
+
+    // 3. INICIO MEJORADO
     function iniciar() {
-        // Leer preferencia del usuario del selector que añadimos
         const select = document.getElementById('words-per-day');
         wordsPerDeck = parseInt(select.value);
+        const aprendidas = getAprendidas();
 
-        const hoy = new Date().getDay(); // 0: Dom, 6: Sab
+        const hoy = new Date().getDay();
         const esFinDeSemana = (hoy === 0 || hoy === 6);
 
         if (esFinDeSemana) {
-            prepararRepasoFinDeSemana();
+            prepararRepasoFinDeSemana(aprendidas);
         } else {
-            // Filtramos cada mazo para que solo tenga las N palabras elegidas
+            // Filtrar: Tomar las primeras N palabras que NO estén en 'aprendidas'
             for (let m = 1; m <= 10; m++) {
-                data[m] = data[m].slice(0, wordsPerDeck);
+                data[m] = data[m].filter(word => !aprendidas.includes(word.id)).slice(0, wordsPerDeck);
             }
         }
 
@@ -146,73 +245,80 @@
         cargarTarjeta();
     }
 
-    function prepararRepasoFinDeSemana() {
+    function prepararRepasoFinDeSemana(aprendidas) {
         let pool = [];
-        for (let m = 1; m <= 10; m++) {
-            pool = pool.concat(data[m].slice(0, wordsPerDeck));
-        }
-        // Mezclar aleatoriamente
+        // En fin de semana repasamos las que YA sabemos para no olvidarlas
+        const todas = [];
+        for(let m=1; m<=10; m++) data[m].forEach(w => todas.push(w));
+        
+        pool = todas.filter(word => aprendidas.includes(word.id));
         pool.sort(() => Math.random() - 0.5);
-        data["repaso"] = pool;
+        
+        data["repaso"] = pool.slice(0, 50); // Límite de 50 para el repaso
         currentDeck = "repaso";
+    }
+
+    function cargarTarjeta() {
+        const deck = data[currentDeck];
+        if (!deck || deck.length === 0) {
+            document.getElementById('card').innerHTML = "<h2 style='padding:20px'>¡Mazo completado!<br>Vuelve mañana para nuevas palabras.</h2>";
+            return;
+        }
+
+        const item = deck[currentIndex];
+        document.getElementById('card').classList.remove('is-flipped');
+        document.getElementById('q-img').src = item.i;
+        document.getElementById('q-word').innerText = item.w;
+        document.getElementById('q-sent').innerText = item.s;
+        document.getElementById('a-word').innerText = item.t;
+        document.getElementById('a-sent').innerText = item.st;
+        
+        const totalAprendidas = getAprendidas().length;
+        document.getElementById('progress-tag').innerText = `Mazo ${currentDeck} | ${currentIndex + 1}/${deck.length} (Total: ${totalAprendidas}/1000)`;
+    }
+
+    function responder(entendido) {
+        const deck = data[currentDeck];
+        const item = deck[currentIndex];
+
+        if (entendido) {
+            // Si es un día normal, guardamos que ya se la sabe
+            if (currentDeck !== "repaso") {
+                guardarProgreso(item.id);
+            }
+            deck.splice(currentIndex, 1); // La quitamos de la sesión de hoy
+        } else {
+            // Si falla, la mueve al final para repetir ahora mismo
+            const failItem = deck.splice(currentIndex, 1)[0];
+            deck.push(failItem);
+        }
+
+        // Si el mazo se vacía, terminó
+        if (deck.length === 0) {
+            alert("¡Buen trabajo! Has terminado este mazo por hoy.");
+        }
+        
+        cargarTarjeta();
     }
 
     function crearMenu(esFinde) {
         const menu = document.getElementById('menu-items');
         menu.innerHTML = '';
-        
-        const mazosAMostrar = esFinde ? ["repaso"] : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        const mazos = esFinde ? ["repaso"] : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-        mazosAMostrar.forEach(key => {
+        mazos.forEach(key => {
             const btn = document.createElement('div');
             btn.className = `nav-item ${currentDeck == key ? 'active' : ''}`;
-            btn.innerHTML = `<span class="nav-text">${key === 'repaso' ? 'REPASO FIN DE SEMANA' : 'MAZO ' + key}</span>`;
+            btn.innerHTML = `<span class="nav-text">${key === 'repaso' ? 'REPASO' : 'MAZO ' + key}</span>`;
             btn.onclick = () => {
                 currentDeck = key;
                 currentIndex = 0;
-                actualizarEstiloMenu(btn);
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                btn.classList.add('active');
                 cargarTarjeta();
             };
             menu.appendChild(btn);
         });
-    }
-
-    function actualizarEstiloMenu(elementoActivo) {
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        elementoActivo.classList.add('active');
-    }
-
-    function cargarTarjeta() {
-        const deck = data[currentDeck];
-        if (!deck || deck.length === 0) return;
-
-        const item = deck[currentIndex];
-        document.getElementById('card').classList.remove('is-flipped');
-        
-        document.getElementById('q-img').src = item.i;
-        document.getElementById('q-word').innerText = item.w;
-        document.getElementById('q-sent').innerText = item.s;
-        
-        document.getElementById('a-word').innerText = item.t;
-        document.getElementById('a-sent').innerText = item.st;
-        
-        document.getElementById('progress-tag').innerText = `Tarjeta ${currentIndex + 1} de ${deck.length}`;
-    }
-
-    function responder(entendido) {
-        const deck = data[currentDeck];
-        if (entendido) {
-            currentIndex++;
-            if (currentIndex >= deck.length) {
-                alert("¡Mazo completado!");
-                currentIndex = 0;
-            }
-        } else {
-            // Si falla, se mueve al final (Repetición)
-            const item = deck.splice(currentIndex, 1)[0];
-            deck.push(item);
-        }
-        cargarTarjeta();
     }
 </script>
 </body>
