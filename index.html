@@ -97,11 +97,21 @@
 
     <script>
         // --- 1. BASE DE DATOS (DATA) ---
-        const data = {
+       const data = {
             1: [
-                { id: "1-1", w: "Apple", t: "Manzana", s: "I eat an apple.", st: "Yo como una manzana.", i: "https://picsum.photos/400/300" }
+                { id: "1-1", w: "Way", t: "Camino / Manera", s: "This is the way to the park.", st: "Este es el camino al parque.", i: "https://images.unsplash.com/photo-1470240731273-7821a6eeb6bd?w=400" },
+                { id: "1-2", w: "Day", t: "Día", s: "Today is a sunny day.", st: "Hoy es un día soleado.", i: "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=400" },
+                { id: "1-3", w: "Man", t: "Hombre", s: "The man is reading a book.", st: "El hombre está leyendo un libro.", i: "https://images.unsplash.com/photo-1503443207922-dff7d543fd0e?w=400" },
+                { id: "1-4", w: "World", t: "Mundo", s: "I want to travel the world.", st: "Quiero viajar por el mundo.", i: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400" },
+                { id: "1-5", w: "Life", t: "Vida", s: "Life is beautiful.", st: "La vida es bella.", i: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400" },
+                { id: "1-6", w: "Part", t: "Parte", s: "This is the best part.", st: "Esta es la mejor parte.", i: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400" },
+                { id: "1-7", w: "Child", t: "Niño / Niña", s: "The child is playing.", st: "El niño está jugando.", i: "https://images.unsplash.com/photo-1503919545889-aef636e10ad4?w=400" },
+                { id: "1-8", w: "Eye", t: "Ojo", s: "Close your eyes.", st: "Cierra los ojos.", i: "https://images.unsplash.com/photo-1544411047-c491584222f0?w=400" },
+                { id: "1-9", w: "Woman", t: "Mujer", s: "She is a strong woman.", st: "Ella es una mujer fuerte.", i: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=400" },
+                { id: "1-10", w: "Place", t: "Lugar", s: "This is a quiet place.", st: "Este es un lugar tranquilo.", i: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400" }
             ],
-            2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: []
+            2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: [],
+            "repaso": [] // Mazo especial para fines de semana
         };
 
         // --- 2. VARIABLES GLOBALES ---
@@ -110,12 +120,35 @@
         let wordsPerDeck = 5;
 
         // --- 3. FUNCIONES DEL MOTOR ---
-        function iniciar() {
+       function iniciar() {
+            // 1. Obtener límite diario (ej. 5 o 10 palabras)
+            const select = document.getElementById('words-per-day');
+            wordsPerDeck = parseInt(select.value);
+
+            // 2. Detectar si es fin de semana (Sábado=6, Domingo=0)
+            const hoy = new Date().getDay();
+            const esFinde = (hoy === 0 || hoy === 6);
+
+            if (esFinde) {
+                alert("¡Modo Fin de Semana! Vamos a repasar palabras aprendidas.");
+                currentDeck = "repaso";
+                prepararRepaso(); // Función que busca lo que ya estudiaste
+            } else {
+                currentDeck = 1; // En semana, empezamos por el Mazo 1 o el que elijas
+            }
+
             document.getElementById('overlay').style.display = 'none';
-            crearMenu();
+            crearMenu(esFinde);
             cargarTarjeta();
         }
 
+        function prepararRepaso() {
+            const aprendidas = JSON.parse(localStorage.getItem('refold_aprendidas')) || [];
+            // Filtramos todas las palabras de todos los mazos que ya marcaste como "Entendido"
+            let todas = [];
+            for (let m in data) { if(m !== "repaso") todas = todas.concat(data[m]); }
+            data["repaso"] = todas.filter(p => aprendidas.includes(p.id));
+        }
         function cargarTarjeta() {
             const mazo = data[currentDeck] || [];
             const container = document.getElementById('card');
@@ -164,3 +197,4 @@
     </script>
 </body>
 </html>
+
