@@ -149,29 +149,35 @@
             for (let m in data) { if(m !== "repaso") todas = todas.concat(data[m]); }
             data["repaso"] = todas.filter(p => aprendidas.includes(p.id));
         }
-       function cargarTarjeta() {
-    // 1. Obtener el mazo completo
-    let mazoCompleto = data[currentDeck] || [];
+      function cargarTarjeta() {
+    // 1. Seleccionar el mazo (Normal o Repaso)
+    let mazoCompleto = (currentDeck === "repaso") ? (data["repaso"] || []) : (data[currentDeck] || []);
     
-    // 2. CREAR EL CORTE: Solo agarramos la cantidad que elegiste (5 o 10)
+    // 2. APLICAR EL FILTRO DE CANTIDAD (Aquí es donde se arregla lo de las 5 palabras)
+    // El slice corta desde la primera palabra hasta el número que elegiste (wordsPerDeck)
     const mazoReducido = mazoCompleto.slice(0, wordsPerDeck);
     
     const container = document.getElementById('card');
 
-    // 3. Usar el mazo cortado para verificar si terminamos
+    // 3. Si terminamos las palabras del mazo cortado
     if (mazoReducido.length === 0 || currentIndex >= mazoReducido.length) {
-        container.innerHTML = `<div class="face"><h2>Mazo ${currentDeck} completado</h2><p>Has estudiado las ${wordsPerDeck} palabras de hoy.</p></div>`;
+        container.innerHTML = `
+            <div class="face">
+                <h2>Mazo ${currentDeck === 'repaso' ? 'de Repaso' : currentDeck} completado</h2>
+                <p>Has terminado tus ${wordsPerDeck} palabras programadas.</p>
+            </div>`;
         return;
     }
 
     const item = mazoReducido[currentIndex];
     container.classList.remove('is-flipped');
 
-    // Audio y carga de datos (lo que ya tenías)
+    // --- AUDIO AUTOMÁTICO ---
     const voz = new SpeechSynthesisUtterance(item.w);
     voz.lang = 'en-US'; 
     window.speechSynthesis.speak(voz);
 
+    // --- CARGA DE DATOS ---
     const imgElement = document.getElementById('q-img');
     imgElement.src = item.i;
     imgElement.onerror = function() { this.src = "https://picsum.photos/400/300?grayscale"; };
@@ -181,17 +187,12 @@
     document.getElementById('a-word').innerText = item.t;
     document.getElementById('a-sent').innerText = item.st;
     
-    // Actualizar el texto de progreso (ej. "Tarjeta 1 de 5")
-    document.getElementById('progress-tag').innerText = `Tarjeta ${currentIndex + 1} de ${mazoReducido.length}`;
+    // Actualizar progreso visual
+    const progressTag = document.getElementById('progress-tag');
+    if (progressTag) {
+        progressTag.innerText = `Tarjeta ${currentIndex + 1} de ${mazoReducido.length}`;
+    }
 }
-        function responder(entendido) {
-            if (entendido) {
-                // Aquí podrías guardar en localStorage si quisieras
-            }
-            currentIndex++;
-            cargarTarjeta();
-        }
-
         function crearMenu() {
             const menu = document.getElementById('menu-items');
             menu.innerHTML = '';
@@ -212,6 +213,7 @@
     </script>
 </body>
 </html>
+
 
 
 
