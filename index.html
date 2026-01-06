@@ -392,134 +392,97 @@
             { id: "m3-100", w: "Damage", t: "Daño/Dañar", s: "Serious damage.", st: "Daño serio.", i: "https://picsum.photos/seed/m3p100/400/300" }
         ], 
             };
-    // 2. LÓGICA DE MEMORIA (LocalStorage)
-    function getAprendidas() {
-        return JSON.parse(localStorage.getItem('refold_aprendidas')) || [];
-    }
-
-    function guardarProgreso(id) {
-        let aprendidas = getAprendidas();
-        if (!aprendidas.includes(id)) {
-            aprendidas.push(id);
-            localStorage.setItem('refold_aprendidas', JSON.stringify(aprendidas));
-        }
-    };
+   // --- 1. VARIABLES GLOBALES ---
 let currentDeck = 1;
 let currentIndex = 0;
 let wordsPerDeck = 5;
 let wordsToday = [];
-    // 3. INICIO MEJORADO
-    function iniciar() {
-        const select = document.getElementById('words-per-day');
-        wordsPerDeck = parseInt(select.value);
-        const aprendidas = getAprendidas();
+let conteoSesion = {}; // Esto evita errores en la lógica de estudio
 
-        const hoy = new Date().getDay();
-        const esFinDeSemana = (hoy === 0 || hoy === 6);
+// --- 2. LÓGICA DE MEMORIA (LocalStorage) ---
+function getAprendidas() {
+    return JSON.parse(localStorage.getItem('refold_aprendidas')) || [];
+}
 
-        if (esFinDeSemana) {
-            prepararRepasoFinDeSemana(aprendidas);
-        } else {
-            // Filtrar: Tomar las primeras N palabras que NO estén en 'aprendidas'
-        }
-
-        document.getElementById('overlay').style.display = 'none';
-        crearMenu(esFinDeSemana);
-        cargarTarjeta();
+function guardarProgreso(id) {
+    let aprendidas = getAprendidas();
+    if (!aprendidas.includes(id)) {
+        aprendidas.push(id);
+        localStorage.setItem('refold_aprendidas', JSON.stringify(aprendidas));
     }
+}
 
-    function prepararRepasoFinDeSemana(aprendidas) {
-        let pool = [];
-        // En fin de semana repasamos las que YA sabemos para no olvidarlas
-        const todas = [];
-        for(let m=1; m<=10; m++) data[m].forEach(w => todas.push(w));
-        
-        pool = todas.filter(word => aprendidas.includes(word.id));
-        pool.sort(() => Math.random() - 0.5);
-        
-        data["repaso"] = pool.slice(0, 50); // Límite de 50 para el repaso
-        currentDeck = "repaso";
-    }
+// --- 3. INICIO DEL PROGRAMA ---
+function iniciar() {
+    const select = document.getElementById('words-per-day');
+    if (select) wordsPerDeck = parseInt(select.value);
 
-    // 1. Añadimos una variable para la "nube temporal" de la sesión
-let conteoSesion = {}; 
+    // Ocultar pantalla de inicio
+    const overlay = document.getElementById('overlay');
+    if (overlay) overlay.style.display = 'none';
 
+    const hoy = new Date().getDay();
+    const esFinDeSemana = (hoy === 0 || hoy === 6);
+
+    crearMenu(esFinDeSemana);
+    cargarTarjeta();
+}
+
+// --- 4. RENDERIZADO DE TARJETAS (Sin errores de q-img) ---
 function cargarTarjeta() {
-    const deck = (currentDeck === "repaso") ? data["repaso"] : data[currentDeck];
-    if (!deck || deck.length === 0) {
-        document.getElementById('card').innerHTML = "<h2 style='padding:20px'>¡Mazo completado!<br>Vuelve mañana.</h2>";
-        return;
+    const deck = (currentDeck === "repaso") ? (data["repaso"] || []) : (data[currentDeck] || []);
+    const container = document.getElementById('card');
+
+    // Si el mazo está vacío o no existe
+    if (!deck || deck.length === 0 || currentIndex >= deck.length) {
+        if (container) {
+            container.innerHTML = "<h2 style='padding:30px; text-align:center;'>¡Mazo completado!</h2>";
+        }
+        return; 
     }
 
-    // Si la carta no tiene conteo en esta sesión, empezamos en 0
     const item = deck[currentIndex];
+    
+    // Inicializar conteo si no existe
     if (!conteoSesion[item.id]) conteoSesion[item.id] = 0;
 
-    document.getElementById('card').classList.remove('is-flipped');
-    document.getElementById('q-img').src = item.i;
+    // Resetear giro de tarjeta
+    if (container) container.classList.remove('is-flipped');
+
+    // Inyectar datos verificando que el ID existe en el HTML
+    const imgElement = document.getElementById('q-img');
+    if (imgElement) imgElement.src = item.i;
+
     document.getElementById('q-word').innerText = item.w;
     document.getElementById('q-sent').innerText = item.s;
     document.getElementById('a-word').innerText = item.t;
     document.getElementById('a-sent').innerText = item.st;
-    
-    // Mostramos cuántas veces llevas confirmada esta palabra (0 de 3, 1 de 3, etc.)
-    const totalAprendidas = getAprendidas().length;
-    document.getElementById('progress-tag').innerText = 
-        `Mazo ${currentDeck} | Repasos: ${conteoSesion[item.id]}/3 | Total: ${totalAprendidas}/1000`;
 }
 
-function responder(entendido) {
-    const deck = data[currentDeck];
-    const item = deck[currentIndex];
-
-    if (entendido) {
-        // Aumentamos el contador de la "nube temporal"
-        conteoSesion[item.id]++;
-
-        if (conteoSesion[item.id] >= 3) {
-            // ¡SOLO AQUÍ SE GUARDA COMO APRENDIDA DE VERDAD!
-            if (currentDeck !== "repaso") {
-                guardarProgreso(item.id);
-            }
-            deck.splice(currentIndex, 1); 
-        } else {
-            // Si aún no llega a 3, la mandamos al final para que vuelva a salir
-            const temp = deck.splice(currentIndex, 1)[0];
-            deck.push(temp);
-        }
-    } else {
-        // Si falla, reseteamos su contador a 0 y al final
-        conteoSesion[item.id] = 0;
-        const failItem = deck.splice(currentIndex, 1)[0];
-        deck.push(failItem);
-    }
-
-    if (deck.length === 0) {
-        alert("¡Sesión finalizada! Has confirmado todas las palabras 3 veces.");
-    }
+// --- 5. MENÚ DE NAVEGACIÓN ---
+function crearMenu(esFinde) {
+    const menu = document.getElementById('menu-items');
+    if (!menu) return;
     
-    cargarTarjeta();
-    }
+    menu.innerHTML = '';
+    const mazos = esFinde ? ["repaso"] : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-    function crearMenu(esFinde) {
-        const menu = document.getElementById('menu-items');
-        menu.innerHTML = '';
-        const mazos = esFinde ? ["repaso"] : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-
-        mazos.forEach(key => {
-            const btn = document.createElement('div');
-            btn.className = `nav-item ${currentDeck == key ? 'active' : ''}`;
-            btn.innerHTML = `<span class="nav-text">${key === 'repaso' ? 'REPASO' : 'MAZO ' + key}</span>`;
-            btn.onclick = () => {
-                currentDeck = key;
-                currentIndex = 0;
-                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                btn.classList.add('active');
-                cargarTarjeta();
-            };
-            menu.appendChild(btn);
-        });
+    mazos.forEach(key => {
+        const btn = document.createElement('div');
+        btn.className = `nav-item ${currentDeck == key ? 'active' : ''}`;
+        btn.innerHTML = `<span class="nav-text">${key === 'repaso' ? 'REPASO' : 'MAZO ' + key}</span>`;
+        
+        btn.onclick = () => {
+            currentDeck = key;
+            currentIndex = 0;
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            btn.classList.add('active');
+            cargarTarjeta();
+        };
+        menu.appendChild(btn);
+    });
     }
 </script>
 </body>
 </html>
+
