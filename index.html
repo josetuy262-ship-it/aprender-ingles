@@ -149,26 +149,38 @@
             for (let m in data) { if(m !== "repaso") todas = todas.concat(data[m]); }
             data["repaso"] = todas.filter(p => aprendidas.includes(p.id));
         }
-        function cargarTarjeta() {
-            const mazo = data[currentDeck] || [];
-            const container = document.getElementById('card');
+       function cargarTarjeta() {
+    const mazo = data[currentDeck] || [];
+    const container = document.getElementById('card');
 
-            if (mazo.length === 0 || currentIndex >= mazo.length) {
-                container.innerHTML = `<div class="face"><h2>Mazo ${currentDeck} completado</h2><p>Selecciona otro mazo arriba</p></div>`;
-                return;
-            }
+    if (mazo.length === 0 || currentIndex >= mazo.length) {
+        container.innerHTML = `<div class="face"><h2>Mazo completado</h2></div>`;
+        return;
+    }
 
-            const item = mazo[currentIndex];
-            container.classList.remove('is-flipped');
+    const item = mazo[currentIndex];
+    container.classList.remove('is-flipped');
 
-            // Llenado de datos
-            document.getElementById('q-img').src = item.i;
-            document.getElementById('q-word').innerText = item.w;
-            document.getElementById('q-sent').innerText = item.s;
-            document.getElementById('a-word').innerText = item.t;
-            document.getElementById('a-sent').innerText = item.st;
-        }
+    // --- AUDIO AUTOMÁTICO ---
+    // El navegador dirá la palabra en inglés apenas cargue la tarjeta
+    const voz = new SpeechSynthesisUtterance(item.w);
+    voz.lang = 'en-US'; 
+    window.speechSynthesis.speak(voz);
 
+    // --- CARGAR IMAGEN CON SEGURIDAD ---
+    const imgElement = document.getElementById('q-img');
+    imgElement.src = item.i;
+    
+    // Si la imagen falla, ponemos una por defecto para que no se vea el error
+    imgElement.onerror = function() {
+        this.src = "https://picsum.photos/400/300?grayscale"; // Imagen gris de repuesto
+    };
+
+    document.getElementById('q-word').innerText = item.w;
+    document.getElementById('q-sent').innerText = item.s;
+    document.getElementById('a-word').innerText = item.t;
+    document.getElementById('a-sent').innerText = item.st;
+}
         function responder(entendido) {
             if (entendido) {
                 // Aquí podrías guardar en localStorage si quisieras
@@ -197,4 +209,5 @@
     </script>
 </body>
 </html>
+
 
