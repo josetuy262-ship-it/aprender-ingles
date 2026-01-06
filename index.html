@@ -480,9 +480,21 @@ function crearMenu(esFinde) {
             cargarTarjeta();
         };
         menu.appendChild(btn);
-    });
+    }
+    function responder(calificacion) {
+    const mazoActual = (currentDeck === "repaso") ? (data["repaso"] || []) : (data[currentDeck] || []);
+    const item = mazoActual[currentIndex];
+
+    if (item && calificacion >= 3) {
+        guardarProgreso(item.id); // Guarda si la palabra fue fácil
+    }
+
+    currentIndex++; // Pasa a la siguiente palabra
+    cargarTarjeta();
+});
     }
 </script>
 </body>
 </html>
+
 
