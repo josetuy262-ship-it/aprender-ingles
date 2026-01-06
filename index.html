@@ -150,36 +150,39 @@
             data["repaso"] = todas.filter(p => aprendidas.includes(p.id));
         }
        function cargarTarjeta() {
-    const mazo = data[currentDeck] || [];
+    // 1. Obtener el mazo completo
+    let mazoCompleto = data[currentDeck] || [];
+    
+    // 2. CREAR EL CORTE: Solo agarramos la cantidad que elegiste (5 o 10)
+    const mazoReducido = mazoCompleto.slice(0, wordsPerDeck);
+    
     const container = document.getElementById('card');
 
-    if (mazo.length === 0 || currentIndex >= mazo.length) {
-        container.innerHTML = `<div class="face"><h2>Mazo completado</h2></div>`;
+    // 3. Usar el mazo cortado para verificar si terminamos
+    if (mazoReducido.length === 0 || currentIndex >= mazoReducido.length) {
+        container.innerHTML = `<div class="face"><h2>Mazo ${currentDeck} completado</h2><p>Has estudiado las ${wordsPerDeck} palabras de hoy.</p></div>`;
         return;
     }
 
-    const item = mazo[currentIndex];
+    const item = mazoReducido[currentIndex];
     container.classList.remove('is-flipped');
 
-    // --- AUDIO AUTOMÁTICO ---
-    // El navegador dirá la palabra en inglés apenas cargue la tarjeta
+    // Audio y carga de datos (lo que ya tenías)
     const voz = new SpeechSynthesisUtterance(item.w);
     voz.lang = 'en-US'; 
     window.speechSynthesis.speak(voz);
 
-    // --- CARGAR IMAGEN CON SEGURIDAD ---
     const imgElement = document.getElementById('q-img');
     imgElement.src = item.i;
-    
-    // Si la imagen falla, ponemos una por defecto para que no se vea el error
-    imgElement.onerror = function() {
-        this.src = "https://picsum.photos/400/300?grayscale"; // Imagen gris de repuesto
-    };
+    imgElement.onerror = function() { this.src = "https://picsum.photos/400/300?grayscale"; };
 
     document.getElementById('q-word').innerText = item.w;
     document.getElementById('q-sent').innerText = item.s;
     document.getElementById('a-word').innerText = item.t;
     document.getElementById('a-sent').innerText = item.st;
+    
+    // Actualizar el texto de progreso (ej. "Tarjeta 1 de 5")
+    document.getElementById('progress-tag').innerText = `Tarjeta ${currentIndex + 1} de ${mazoReducido.length}`;
 }
         function responder(entendido) {
             if (entendido) {
@@ -209,5 +212,6 @@
     </script>
 </body>
 </html>
+
 
 
