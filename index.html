@@ -66,7 +66,7 @@
         <div class="card-container">
             <div class="card" id="card" onclick="this.classList.toggle('is-flipped')">
                 <div class="face">
-                    <div class="img-box"><img id="q-img" src=""></div>
+                    <div class="img-box"><img id="q-img" src="" alt="Imagen de la palabra"></div>
                     <div class="word" id="q-word">...</div>
                     <div class="sentence" id="q-sent">...</div>
                 </div>
@@ -445,7 +445,7 @@ let wordsToday = [];
 let conteoSesion = {}; 
 
 function cargarTarjeta() {
-    const deck = data[currentDeck];
+    const deck = (currentDeck === "repaso") ? data["repaso"] : data[currentDeck];
     if (!deck || deck.length === 0) {
         document.getElementById('card').innerHTML = "<h2 style='padding:20px'>¡Mazo completado!<br>Vuelve mañana.</h2>";
         return;
@@ -523,13 +523,3 @@ function responder(entendido) {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
